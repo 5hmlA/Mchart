@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MProgressWidthMsg">
+        <!--进度条颜色-->
+        <attr name="recColor" format="color"></attr>
+        <!--文字颜色-->
+        <attr name="textColor" format="color"/>
+        <!--单位-->
+        <attr name="unit" format="string"/>
+        <!--圆角半径-->
+        <attr name="recRound" format="dimension"/>
+        <attr name="TextToProgress" format="dimension"/>
+        <attr name="currprogress" format="float"/>
+        <!--是否显示 百分比-->
+        <attr name="percent" format="boolean"/>
+        <attr name="maxprogress" format="float"/>
+    </declare-styleable>
+</resources>

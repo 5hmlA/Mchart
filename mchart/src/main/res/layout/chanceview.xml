@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:mpieview="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@android:color/white"
+              android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="228dp"
+        android:background="@drawable/abc_popup_background_mtrl_mult"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/cardtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:text="数量"
+            android:textColor="@android:color/black"
+            android:textSize="16sp"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="68dp"
+            android:orientation="horizontal"
+            android:paddingBottom="30dp"
+            >
+
+            <com.refuse.mchar.view.MPieView
+                android:id="@+id/mpieview"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center_vertical">
+
+            </com.refuse.mchar.view.MPieView>
+
+            <TableLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="24dp"
+                >
+
+                <TableRow
+                    android:layout_weight="1">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/bi_customer_chance_1"
+                        android:drawablePadding="10dp"
+                        android:text="赢单"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:id="@+id/bi_customer_chance_win"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="24dp"
+                        android:text="80"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="14sp"/>
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        android:layout_marginTop="20dp"
+                        android:drawableLeft="@drawable/bi_customer_chance_2"
+                        android:drawablePadding="10dp"
+                        android:text="丢单"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:id="@+id/bi_customer_chance_lose"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="20dp"
+                        android:layout_marginLeft="24dp"
+                        android:layout_marginTop="20dp"
+                        android:text="60"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="14sp"/>
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/bi_customer_chance_3"
+                        android:drawablePadding="10dp"
+                        android:text="进程中"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:id="@+id/bi_customer_chance_pro"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="24dp"
+                        android:text="30"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="14sp"/>
+                </TableRow>
+            </TableLayout>
+        </LinearLayout>
+
+    </RelativeLayout>
+</LinearLayout>
