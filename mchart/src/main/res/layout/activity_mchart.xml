@@ -14,9 +14,9 @@
         android:layout_width="50dp"
         android:layout_height="50dp"/>
 
-    <com.refuse.mchar.view.MProgressWidthMsg
+    <com.refuse.mchar.view.progress.MProgressWidthMsg
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"></com.refuse.mchar.view.MProgressWidthMsg>
+        android:layout_height="wrap_content"></com.refuse.mchar.view.progress.MProgressWidthMsg>
 
 
 </LinearLayout>

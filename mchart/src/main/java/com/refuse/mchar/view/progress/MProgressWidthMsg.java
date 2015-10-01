@@ -1,4 +1,4 @@
-package com.refuse.mchar.view;
+package com.refuse.mchar.view.progress;
 
 import android.content.Context;
 import android.content.res.TypedArray;

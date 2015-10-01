@@ -196,6 +196,10 @@ public class WarmLine extends View {
      */
     protected float TtextSize = 40;
     private ValueAnimator valueAnimator;
+    /**
+     * 按下的时候 去掉所有提示线条
+     */
+    private boolean downCleanLine = true;
 
     public WarmLine(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
@@ -345,7 +349,10 @@ public class WarmLine extends View {
             case MotionEvent.ACTION_DOWN:
 
                 ismoving = false;// 清除move状态
-
+                if(downCleanLine) {
+                    cleanWire = true;
+                    postInvalidate();
+                }
                 down_x = event.getX();
                 down_y = event.getY();
                 if (movingShowTX) {
@@ -371,6 +378,7 @@ public class WarmLine extends View {
                 }
 
                 if (movingShowTX) {
+                    cleanWire = false;
                     // 如果 旋转的时候 不允许显示 提示线条的话 结束
 //                    return true;// 不可以是false 否则后续事件将会丢失
                     if (showInCenAngle) {
@@ -394,6 +402,8 @@ public class WarmLine extends View {
         }
         if (AniLine) {
             drawAniLine(Tstarty, turnY);
+        }else{
+            postInvalidate();
         }
         return super.dispatchTouchEvent(event);
     }
