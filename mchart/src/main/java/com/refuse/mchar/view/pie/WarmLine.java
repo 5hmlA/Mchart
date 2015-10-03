@@ -184,7 +184,7 @@ public class WarmLine extends View {
      * 提示文字大小
      */
     protected float TtextSize = 40;
-    private ValueAnimator valueAnimator;
+    private ValueAnimator valueAnimator = new ValueAnimator();
     /**
      * 按下的时候 去掉所有提示线条
      */

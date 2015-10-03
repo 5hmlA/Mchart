@@ -1,20 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_margin="5dp"
-    android:orientation="vertical" >
+              xmlns:app="http://schemas.android.com/apk/res-auto"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay"/>
+
+    </android.support.design.widget.AppBarLayout>
 
     <com.refuse.mchar.view.pie.MPie
         android:id="@+id/rp"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        android:layout_weight="1" >
+        android:layout_weight="1">
     </com.refuse.mchar.view.pie.MPie>
 
     <com.refuse.mchar.layout.FlowLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" 
+        android:layout_height="wrap_content"
         android:layout_marginBottom="30dp">
 
         <Button
@@ -22,44 +37,45 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="showAni"
-            android:text="展现动画" />
+            android:text="展现动画"/>
 
         <Button
             android:id="@+id/button2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="showLine"
-            android:text="提示线" />
+            android:text="提示线"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="clickSelector"
-            android:text="移动显示" />
+            android:text="移动显示"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="rotateAble"
-            android:text="旋转" />
+            android:text="旋转"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="refresh"
-            android:text="刷新" />
+            android:text="刷新"/>
+
         <Button
             android:id="@+id/center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="center"
-            android:text="center" />
+            android:text="center"/>
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="lianji"
-            android:text="连击" />
+            android:text="连击"/>
     </com.refuse.mchar.layout.FlowLayout>
 
 </LinearLayout>

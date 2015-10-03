@@ -11,9 +11,6 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.refuse.mchar.R;
-import com.refuse.mchar.view.pie.MPie;
-
 public class RoundBollProgress extends View {
 
 	private Paint mPaint;
@@ -285,12 +282,5 @@ public class RoundBollProgress extends View {
 	public void setCenterTextSize(int centerTextSize) {
 		this.centerTextSize = centerTextSize;
 	}
-
-	private MPie pie;
-
-	private void assignViews() {
-		pie = (MPie) findViewById(R.id.pie);
-	}
-
 
 }

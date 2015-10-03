@@ -3,11 +3,15 @@ package com.refuse.mchart_master;
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -31,11 +35,13 @@ public class MChartActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState){
         // TODO Auto-generated method stub
         //		requestWindowFeature(Window.FEATURE_NO_TITLE);
-        Window window = getWindow();
-        window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-        window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        //        Window window = getWindow();
+        //        window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        //        window.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pie);
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         pie = (MPie)findViewById(R.id.rp);
         mCenter = (Button)findViewById(R.id.center);
         mCenter.setOnLongClickListener(new View.OnLongClickListener() {
@@ -50,7 +56,7 @@ public class MChartActivity extends AppCompatActivity implements View.OnClickLis
         pie.setOnClickListener(this);
         pie.setPieShowAnimation(MPie.PieShowAnimation.GROWING);
         //        pie.setShowCenterAll(true);
-        pie.setShowInCenAngle(false);
+        pie.setShowInCenAngle(true);
         pie.setOutMoving(true);
         pie.setShowCenterAll(false);
         pie.setTstartAtTouch(true);
@@ -151,6 +157,35 @@ public class MChartActivity extends AppCompatActivity implements View.OnClickLis
     public void center(View v){
         pie.setShowInCenAngle(!pie.isShowInCenAngle());
         mCenter.setText(pie.isShowInCenAngle() ? "center" : "atTouch");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_mchart, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if(id == R.id.action_settings) {
+            Intent progress = new Intent(this, ProgressActuvity.class);
+            startActivity(progress);
+            return true;
+        }
+        if(id == R.id.action_second) {
+            Intent progress = new Intent(this, SecondActivity.class);
+            startActivity(progress);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 }

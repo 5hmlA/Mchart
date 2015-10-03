@@ -3,7 +3,11 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context=".MChartActivity">
     <item android:id="@+id/action_settings"
-          android:title="@string/action_settings"
+          android:title="progressui"
+          android:orderInCategory="100"
+          app:showAsAction="never"/>
+      <item android:id="@+id/action_second"
+          android:title="secondui"
           android:orderInCategory="100"
           app:showAsAction="never"/>
 </menu>

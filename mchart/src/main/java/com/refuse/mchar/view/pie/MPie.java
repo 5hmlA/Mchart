@@ -758,7 +758,6 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
      */
     public void extraDataInit(){
         DecimalFormat format = new DecimalFormat("##.##");
-        //        if(showInCenAngle) {
         //无论是否对角线显示都 传数据到画线
         List<Map<String,Object>> showDatas = new ArrayList<>();
         for(Apiece epie : pieData) {
@@ -770,7 +769,6 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
             String show = TextUtils.isEmpty(epie.getDescribe()) ? format.format(epie.getNum()): epie.getDescribe();
             pieMap.put("show", show);//提示内容 desc
             showDatas.add(pieMap);
-            //            }
             //将数据传递到父类 line
             setPieAngles(showDatas);
         }
