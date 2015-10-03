@@ -35,7 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="clickSelector"
-            android:text="点击" />
+            android:text="移动显示" />
 
         <Button
             android:layout_width="wrap_content"
@@ -48,6 +48,12 @@
             android:layout_height="wrap_content"
             android:onClick="refresh"
             android:text="刷新" />
+        <Button
+            android:id="@+id/center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="center"
+            android:text="center" />
 
         <Button
             android:layout_width="wrap_content"
