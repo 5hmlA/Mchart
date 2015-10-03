@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:jonas="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_margin="5dp"
+              android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <com.refuse.mchar.view.progress.MProgressBall
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="200dp"
+            jonas:balltextSize="20sp"
+            jonas:progressMax="400">
+        </com.refuse.mchar.view.progress.MProgressBall>
+
+        <com.refuse.mchar.view.progress.MProgressWidthMsg
+            android:id="@+id/progress_msg"
+            android:layout_width="match_parent"
+            android:layout_height="20dp">
+
+        </com.refuse.mchar.view.progress.MProgressWidthMsg>
+    </LinearLayout>
+
+    <com.refuse.mchar.layout.FlowLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp">
+
+        <Button
+            android:id="@+id/button4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="showAni"
+            android:text="展现动画"/>
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="showLine"
+            android:text="提示线"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="clickSelector"
+            android:text="点击"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="rotateAble"
+            android:text="旋转"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="refresh"
+            android:text="刷新"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="lianji"
+            android:text="连击"/>
+    </com.refuse.mchar.layout.FlowLayout>
+
+
+</LinearLayout>

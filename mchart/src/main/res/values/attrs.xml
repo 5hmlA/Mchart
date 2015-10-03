@@ -4,7 +4,9 @@
         <!--进度条颜色-->
         <attr name="recColor" format="color"></attr>
         <!--文字颜色-->
-        <attr name="textColor" format="color"/>
+        <attr name="msgColor" format="color"/>
+        <!--矩形进度条的背景颜色-->
+        <attr name="backColor" format="color"/>
         <!--单位-->
         <attr name="unit" format="string"/>
         <!--圆角半径-->
@@ -14,5 +16,21 @@
         <!--是否显示 百分比-->
         <attr name="percent" format="boolean"/>
         <attr name="maxprogress" format="float"/>
+        <attr name="msgMode" format="enum">
+            <!--层叠-->
+            <enum name="msg_stack" value="0" />
+            <!--排列-->
+            <enum name="msg_arrange" value="1" />
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="MProgressBall">
+        <attr name="progressColor" format="color"/>
+        <attr name="backgroundColor" format="color"/>
+        <attr name="balltextColor" format="color"/>
+        <attr name="progressMax" format="float"/>
+        <attr name="progressCurrent" format="float"/>
+        <attr name="balltextSize" format="dimension"/>
+
     </declare-styleable>
 </resources>

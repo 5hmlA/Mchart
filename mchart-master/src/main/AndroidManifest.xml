@@ -21,7 +21,7 @@
                 <action android:name="android.intent.action.DELETE" />
             </intent-filter>
         </activity>
-       <activity android:name=".MainActivity">
+       <activity android:name=".ProgressActuvity">
             <intent-filter>
                 <action android:name="android.intent.action.DELETE" />
             </intent-filter>
