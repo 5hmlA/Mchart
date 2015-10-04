@@ -301,7 +301,7 @@ public class WarmLine extends View {
         //=======================================画提示线(有无动画)============================================
 
         //执行 画线 动画
-        else if(AniLine &&(selectedPosition!=-1||down_y!=-1||down_x!=-1)) {// 分母k不可以为0  移动的时候 无动画
+        else if(AniLine && ( selectedPosition != -1 || down_y != -1 || down_x != -1 )) {// 分母k不可以为0  移动的时候 无动画
 
            /* //使用递归onDraw动态画直线 1，
             if(Tstarty<turnY) {
@@ -333,7 +333,7 @@ public class WarmLine extends View {
                     invalidate();
                 }
             }*/
-        }else if(selectedPosition!=-1||down_y!=-1||down_x!=-1){
+        }else if(selectedPosition != -1 || down_y != -1 || down_x != -1) {
             canvas.drawLine(Tstartx, Tstarty, turnX, turnY, pLine);
             endy = turnY;
             canvas.drawLine(turnX, turnY, endx, endy, pLine);
@@ -341,6 +341,8 @@ public class WarmLine extends View {
             float turnX2 = turnX<Lwidth/2 ? turnX-textL-textMarging : turnX+textMarging;
             canvas.drawText(showMsg.get(selectedPosition), turnX2, turnY, textP);
         }
+        //        PointF turn = new PointF(turnX, turnY);
+        //        PointF start = new PointF(Tstartx, Tstarty);
     }
 
     @Override
@@ -615,6 +617,7 @@ public class WarmLine extends View {
         turnPoint[0] = xx1;
         turnPoint[1] = yy1;
 
+
         return turnPoint;
     }
 
@@ -640,7 +643,7 @@ public class WarmLine extends View {
             }
 
 
-            if((selectedPosition!=-1&&selectedPosition<showDatas.size())||down_x!=-1||down_y!=-1) {
+            if(( selectedPosition != -1 || down_x != -1 || down_y != -1 ) && selectedPosition<showDatas.size()) {
                 if(showInCenAngle) {
                     showCenterGetPoint();
                 }else {
@@ -704,6 +707,12 @@ public class WarmLine extends View {
         showLine = showLineTemp = true;
         showInCenAngle = showCenterAll ? showCenterAll : showInCenAngle;
         this.showCenterAll = showCenterAll;
+        if(selectedPosition != -1) {
+            showCenterGetPoint();
+        }
+        if(AniLine) {
+            drawAniLine(Tstarty, turnY);
+        }
         postInvalidate();
     }
 
