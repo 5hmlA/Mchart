@@ -178,7 +178,7 @@ public class MProgressBall extends View {
         float sweep = (float)( acos*2 );
         if(mTierColor.size()>0 && mTierColor.size()>mTier) {
             mPaint.setColor(mTierColor.get(mTier));
-//            mPaint.setAlpha(15);
+            //            mPaint.setAlpha(15);
         }
         canvas.drawArc(mProgressArc, start, sweep, false, mPaint);
 
@@ -276,7 +276,7 @@ public class MProgressBall extends View {
             @Override
             public void onAnimationUpdate(ValueAnimator animation){
                 textCurrent = (float)animation.getAnimatedValue();//文字进度
-                textCurrent = Math.abs(textCurrent-pCurrent)<1?pCurrent:textCurrent;
+                textCurrent = Math.abs(textCurrent-pCurrent)<1 ? pCurrent : textCurrent;
                 //                mTier = (int)textCurrent/( (int)progressMax );
                 //                progressCurrent = textCurrent-( textCurrent == progressMax*mTier ? 0 : mTier )*progressMax;//进度条进度 解决超过100%部分
                 postInvalidate();

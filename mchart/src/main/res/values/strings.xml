@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">MChar</string>
+    <string name="app_name" translatable="false">MChar</string>
+    <string name="test" translatable="false">english</string>
 </resources>

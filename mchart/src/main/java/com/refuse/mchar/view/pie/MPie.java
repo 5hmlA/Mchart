@@ -680,10 +680,12 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
             startAngle += sweepAngle+pieInterWidth;
         }
         this.pieData = pieData2;
-        extraDataInit();
         if(pieData2.get(0).getPieColor() == Integer.MAX_VALUE) {
             setEachPieColor();
         }
+        extraDataInit();
+
+
         postInvalidate();
     }
 
@@ -766,12 +768,12 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
             float sweepAngle = epie.getSweepAngle();
             float cenAngle = startAngle2+sweepAngle/2;
             pieMap.put("angle", cenAngle);//扇形的对角线
-            String show = TextUtils.isEmpty(epie.getDescribe()) ? format.format(epie.getNum()): epie.getDescribe();
+            String show = TextUtils.isEmpty(epie.getDescribe()) ? format.format(epie.getNum()) : epie.getDescribe();
             pieMap.put("show", show);//提示内容 desc
             showDatas.add(pieMap);
-            //将数据传递到父类 line
-            setPieAngles(showDatas);
         }
+        //将数据传递到父类 line
+        setPieAngles(showDatas);
     }
 
     /**

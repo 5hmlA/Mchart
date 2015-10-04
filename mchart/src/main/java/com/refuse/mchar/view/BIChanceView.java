@@ -37,7 +37,7 @@ public class BIChanceView extends RelativeLayout {
     }
 
     private void init(Context context, AttributeSet attrs) {
-        LayoutInflater.from(context).inflate(R.layout.chanceview, this,true);
+        LayoutInflater.from(context).inflate(R.layout.chanceview, this, true);
         pieView = (MPieView) findViewById(R.id.mpieview);
         win = (TextView) findViewById(R.id.bi_customer_chance_win);
         lose = (TextView) findViewById(R.id.bi_customer_chance_lose);
@@ -68,4 +68,5 @@ public class BIChanceView extends RelativeLayout {
     public MPieView getMpieView(){
         return pieView;
     }
+
 }

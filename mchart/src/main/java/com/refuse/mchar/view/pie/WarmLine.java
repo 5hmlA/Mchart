@@ -1,7 +1,6 @@
 package com.refuse.mchar.view.pie;
 
 import android.animation.ValueAnimator;
-import android.animation.ValueAnimator.AnimatorUpdateListener;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -54,7 +53,7 @@ public class WarmLine extends View {
     /**
      * 由饼图传递 该值  点中的扇形位置
      */
-    protected int selectedPosition;
+    protected int selectedPosition = -1;
 
     /**
      * 由饼图传递 该值 已经旋转的角度
@@ -159,8 +158,8 @@ public class WarmLine extends View {
     private float progress;
     private float b;
     private float k;
-    private float down_y;
-    private float down_x;
+    private float down_y = -1;
+    private float down_x = -1;
 
     private int Lwidth;
     private int Lheight;
@@ -302,13 +301,20 @@ public class WarmLine extends View {
         //=======================================画提示线(有无动画)============================================
 
         //执行 画线 动画
-        else if(AniLine) {// 分母k不可以为0  移动的时候 无动画
+        else if(AniLine &&(selectedPosition!=-1||down_y!=-1||down_x!=-1)) {// 分母k不可以为0  移动的时候 无动画
+
+           /* //使用递归onDraw动态画直线 1，
+            if(Tstarty<turnY) {
+                progress +=5;
+            }else {
+                progress-=5;
+            }*/
             // pLine 画斜线
             // 画斜线动画
             canvas.drawLine(Tstartx, Tstarty, ( -progress-b )/k, progress, pLine);
 
             // 当斜线画完之后 在画横线 误差允许范围内
-            if(Math.abs(progress-turnY)<0.0005) {
+            if(Math.abs(progress-turnY)<0.005) {
                 // 画直线
                 endy = turnY;
                 canvas.drawLine(turnX, turnY, endx, endy, pLine);
@@ -316,7 +322,18 @@ public class WarmLine extends View {
                 float turnX2 = turnX<Lwidth/2 ? turnX-textL-textMarging : turnX+textMarging;
                 canvas.drawText(showMsg.get(selectedPosition), turnX2, turnY, textP);
             }
-        }else {
+
+            /*//使用递归onDraw动态画直线 2，
+            if(Tstarty<turnY) {
+                if(progress<=turnY) {
+                    invalidate();
+                }
+            }else {
+                if(progress>turnY) {
+                    invalidate();
+                }
+            }*/
+        }else if(selectedPosition!=-1||down_y!=-1||down_x!=-1){
             canvas.drawLine(Tstartx, Tstarty, turnX, turnY, pLine);
             endy = turnY;
             canvas.drawLine(turnX, turnY, endx, endy, pLine);
@@ -462,6 +479,10 @@ public class WarmLine extends View {
     protected void drawAniLine(float Tstarty, float turnY2){
         // TODO Auto-generated method stub
         AniLine = true;
+
+        /*//利用递归onDraw的方式动态画直线 3
+        progress = Tstarty;*/
+
         // ObjectAnimator的缺点是 该变化的属性 必须要有get和set方法
         // ObjectAnimator.ofFloat(this, "progress",
         // centY,turnY2).setDuration(1000).start();
@@ -474,7 +495,7 @@ public class WarmLine extends View {
         // .setDuration(ANIDURINGTIME);
         valueAnimator.setInterpolator(new AccelerateInterpolator(2));
         valueAnimator.start();
-        valueAnimator.addUpdateListener(new AnimatorUpdateListener() {
+        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 
             @Override
             public void onAnimationUpdate(ValueAnimator animation){
@@ -616,6 +637,22 @@ public class WarmLine extends View {
                 //解析出 提示内容集合
                 String show = (String)map.get("show");
                 showMsg.add(show);
+            }
+
+
+            if((selectedPosition!=-1&&selectedPosition<showDatas.size())||down_x!=-1||down_y!=-1) {
+                if(showInCenAngle) {
+                    showCenterGetPoint();
+                }else {
+                    showAtTouch(down_x, down_y);
+                }
+                if(AniLine) {
+                    drawAniLine(Tstarty, turnY);
+                }
+            }else {
+                //重置提示状态 饼图的选中状态 因为数据变了 选中的位置可能不存在
+                selectedPosition = -1;
+                down_x = down_y = -1;
             }
         }catch(Exception e) {
             throw new RuntimeException("FreeLine====setPieAngles传入的 数据格式错误");
