@@ -3,6 +3,7 @@ package com.refuse.mchar.view.pie;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -12,6 +13,8 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
+
+import com.refuse.mchar.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,7 +115,7 @@ public class WarmLine extends View {
      * 内辅助圆的半径 设定提示线的斜线 多长 默认是外圆半径的一半 内辅助圆半径 默认 1 表示 斜线长为外辅助圆半径的一半 默认提示线从
      * 中点(外辅助圆的)开始画 值为0 表示 提示线从圆心开始画
      */
-    protected float nRadius = 1;
+    protected float nRadius = 0;
     /**
      * 旋转的时候是否显示提示线条 默认false不显示 当旋转的时候 显示提示线条的话 move之后的up还会显示
      * 为true的时候 旋转过程中 提示线动画被取消 没旋转则会有动画 无法取消
@@ -146,9 +149,13 @@ public class WarmLine extends View {
     private int TextColor = Color.BLACK;
 
     /**
-     * 外辅助圆局四周的边距 决定着 外辅助圆的半径 该值和外辅助圆半径成反比
+     * 外辅助圆局四周的边距 也就是 提示线转折点距离边框的最小距离
      */
-    protected float lpading = 50;
+    protected float lpading;
+    /**
+     * 提示线 突出饼图 的部分大小
+     */
+    protected float TsOut;
     /**
      * 外辅助圆的半径 不能直接设定
      */
@@ -191,6 +198,19 @@ public class WarmLine extends View {
 
     public WarmLine(Context context, AttributeSet attrs, int defStyleAttr){
         super(context, attrs, defStyleAttr);
+
+        if(attrs != null) {
+            TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MPieView, defStyleAttr, 0);
+            TsColor = typedArray.getColor(R.styleable.MPieView_TsColor, Color.BLACK);
+            TtextSize = typedArray.getDimension(R.styleable.MPieView_TtextSize, 40);
+            TsWidth = typedArray.getDimension(R.styleable.MPieView_TsWidth, 1);
+            TshLong = typedArray.getDimension(R.styleable.MPieView_TshLong, 0);
+            showLine = typedArray.getBoolean(R.styleable.MPieView_showLine, true);
+            showCenterAll = typedArray.getBoolean(R.styleable.MPieView_showCenterAll, false);
+            showInCenAngle = typedArray.getBoolean(R.styleable.MPieView_showInCenAngle, true);
+            movingShowTX = typedArray.getBoolean(R.styleable.MPieView_movingShowTX, false);
+            typedArray.recycle();
+        }
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         pLine = new Paint(Paint.ANTI_ALIAS_FLAG);
         textP = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -217,11 +237,13 @@ public class WarmLine extends View {
         centX = Lwidth*1f/2;
         centY = Lheight*1f/2;
         // 设置默认值
+        lpading = lpading == 0 ? just/10 : lpading;
+        TsOut = TsOut == 0 ? 40 : TsOut;
+        TtextSize = TtextSize>lpading ? lpading-10 : TtextSize;
+
         wRadius = just/2-lpading;
-        if(TshLong == 0) {
-            TshLong = Lwidth/2;
-        }
-        lpading = just/4;
+        nRadius = nRadius == 0 ? ( wRadius-TsOut )/2 : nRadius;
+        TshLong = TshLong == 0 ? Lwidth/2 : TshLong;
         //初始化
         pLine.setStrokeWidth(TsWidth);
         pLine.setColor(TsColor);
@@ -233,10 +255,7 @@ public class WarmLine extends View {
     protected void onDraw(Canvas canvas){
         super.onDraw(canvas);
         // 设置默认值
-        wRadius = just/2-lpading;
-        if(nRadius == 1) {
-            nRadius = wRadius/2;
-        }
+
         if(!showLine || cleanWire) {
             return;
         }
@@ -295,7 +314,7 @@ public class WarmLine extends View {
                 float textL = textP.measureText(showMsg.get(i));
                 turnX2 = turnX2<Lwidth/2 ? turnX2-textL-textMarging : turnX2+textMarging;
                 //描述
-                canvas.drawText(showMsg.get(i), turnX2, turnY2, textP);
+                canvas.drawText(showMsg.get(i), turnX2, turnY2>centY ? turnY2+TtextSize : turnY2, textP);
             }
         }
         //=======================================画提示线(有无动画)============================================
@@ -320,7 +339,7 @@ public class WarmLine extends View {
                 canvas.drawLine(turnX, turnY, endx, endy, pLine);
                 float textL = textP.measureText(showMsg.get(selectedPosition));
                 float turnX2 = turnX<Lwidth/2 ? turnX-textL-textMarging : turnX+textMarging;
-                canvas.drawText(showMsg.get(selectedPosition), turnX2, turnY, textP);
+                canvas.drawText(showMsg.get(selectedPosition), turnX2, turnY>centY ? turnY+TtextSize : turnY, textP);
             }
 
             /*//使用递归onDraw动态画直线 2，
@@ -339,7 +358,7 @@ public class WarmLine extends View {
             canvas.drawLine(turnX, turnY, endx, endy, pLine);
             float textL = textP.measureText(showMsg.get(selectedPosition));
             float turnX2 = turnX<Lwidth/2 ? turnX-textL-textMarging : turnX+textMarging;
-            canvas.drawText(showMsg.get(selectedPosition), turnX2, turnY, textP);
+            canvas.drawText(showMsg.get(selectedPosition), turnX2, turnY>centY ? turnY+TtextSize : turnY, textP);
         }
         //        PointF turn = new PointF(turnX, turnY);
         //        PointF start = new PointF(Tstartx, Tstarty);
@@ -777,7 +796,6 @@ public class WarmLine extends View {
      * @param tsWidth
      */
     public void setTsWidth(float tsWidth){
-        TsWidth = tsWidth;
         pLine.setStrokeWidth(tsWidth);
     }
 

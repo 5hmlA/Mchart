@@ -97,10 +97,6 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
      * 旋转的角度
      */
     private float degrees;
-    /**
-     * 控件局四周的距离 根据外圆的大小可调饼图的半径
-     */
-    private int padings = 70;
 
     private float centX;
     private float centY;
@@ -124,11 +120,8 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
     /**
      * 制定的某个 扇形 突出的大小 默认13 必须小于 提示线多出饼图的大小TsOut 如果超过则 设置为默认13
      */
-    private float pointPieOut = 13;
-    /**
-     * 提示线 突出饼图 的部分大小
-     */
-    public float TsOut = 30;
+    private float pointPieOut;
+
     /**
      * 当前饼图是否可旋转 默认不可
      */
@@ -157,7 +150,7 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
     private String action;
 
     /**
-     * 饼图的 半径 只能获取
+     * 饼图的 半径
      */
     private float pieRadius;
     /**
@@ -266,10 +259,14 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
             TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MPieView, defStyleAttr, 0);
             pieInterColor = typedArray.getColor(R.styleable.MPieView_pieInterColor, Color.WHITE);
             pieInterWidth = (int)typedArray.getDimension(R.styleable.MPieView_pieInterColor, 0);
+            pointPieOut = typedArray.getDimension(R.styleable.MPieView_pointPieOut, 0);
             backColor = typedArray.getColor(R.styleable.MPieView_piebackground, Color.TRANSPARENT);
+            specialAngle = typedArray.getInt(R.styleable.MPieView_specialAngle, 0);
+            outMoving = typedArray.getBoolean(R.styleable.MPieView_outMoving, false);
+            PieSelector = typedArray.getBoolean(R.styleable.MPieView_PieSelector, true);
             typedArray.recycle();
         }
-//        paintInter.setColor(pieInterColor); 出错 why？？
+        //        paintInter.setColor(pieInterColor); 出错 why？？
         init();
     }
 
@@ -311,21 +308,14 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
         centY = height*1f/2;
 
         // 防止 突出扇形突出过大
-        // pointPieOut = just/2-padings;
-        pointPieOut = pointPieOut>padings ? padings : pointPieOut;
-        // 提示线突出饼图至少20 根据外圆的大小可调饼图的半径
-        if(padings-lpading<TsOut) {
-            padings = (int)( lpading-TsOut );
-            // lpading = padings - TsOut;
-        }
-
-        pieRadius = just/2-padings;
+        pointPieOut = pointPieOut>TsOut ? TsOut/2 : pointPieOut == 0 ? TsOut/2 : pointPieOut;
+        pieRadius = pieRadius == 0 ? wRadius-TsOut : pieRadius>wRadius-TsOut ? wRadius-TsOut : pieRadius;
+        pieInterWidth = pieInterWidth>TsOut-pointPieOut ? (int)( TsOut-pointPieOut-10 ) : pieInterWidth;
 
         fillOutRectF = new RectF(centX-fillouting, centY-fillouting, centX+fillouting, centY+fillouting);
         arcRectF = new RectF(centX-pieRadius, centY-pieRadius, centX+pieRadius, centY+pieRadius);
         outRectF = new RectF(centX-pieRadius-pointPieOut, centY-pieRadius-pointPieOut, centX+pieRadius+pointPieOut,
                 centY+pieRadius+pointPieOut);
-
 
 
         // 当背景为透明的时候 获取布局的背景色
@@ -363,9 +353,9 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
         // 无论控件 那边大 都在中间的正方形画饼图
 
         // 画背景
-//        mPaint.setColor(backColor);
-//        RectF back = new RectF(0, 0, width, height);
-//        canvas.drawRect(back, mPaint);
+        //        mPaint.setColor(backColor);
+        //        RectF back = new RectF(0, 0, width, height);
+        //        canvas.drawRect(back, mPaint);
 
         //        // 画标题
         //        float measureText = titleP.measureText(pieTiele);
@@ -373,10 +363,6 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
         //        titleP.getTextBounds(pieTiele, 0, pieTiele.length(), bounds);
         //        canvas.drawText(pieTiele, width / 2 - measureText / 2, (height / 2) * 1f / 2 - bounds.height(), titleP);
 
-        // TODO 提示线突出饼图至少20
-        if(padings-lpading<TsOut) {
-            lpading = padings-TsOut;
-        }
         RectF oval;
         if(pieshowani == PieShowAnimation.FILLOUTING) {
             // 画扇形所需要的 矩形======扇形==从内往外 变大==所用=同时也是最终扇形所用的矩形============
@@ -393,12 +379,11 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
         // paint.setColor(Color.RED);
         // canvas.drawRect(oval, paint);
 
-        // TODO
         // 将 提示线的起点 设定到 饼图半径的一半处
-        if(nRadius == 1) {
-            nRadius = pieRadius/2;
-            Log.d("提示线起点", "将 提示线的起点 设定到 饼图半径的一半处:"+nRadius);
-        }
+        //        if(nRadius == 1) {
+        //            nRadius = pieRadius/2;
+        //            Log.d("提示线起点", "将 提示线的起点 设定到 饼图半径的一半处:"+nRadius);
+        //        }
 
         Apiece pie = null;
         for(int i = 0; i<pieData.size(); i++) {
@@ -419,7 +404,7 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
                 // 提起时 选中的扇形变大
                 canvas.drawArc(outRectF, startPie*showProgress, pie.getSweepAngle()*showProgress, true, mPaint);
 
-                if(pieInterWidth!=0) {
+                if(pieInterWidth != 0) {
                     canvas.drawArc(outRectF, startPie*showProgress, pie.getSweepAngle()*showProgress, true, paintInter);
                 }
 
@@ -434,13 +419,13 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
                     PieSelector = false;
                     // 画突出扇形
                     canvas.drawArc(outRectF, startPie*showProgress, pie.getSweepAngle()*showProgress, true, mPaint);
-                    if(pieInterWidth!=0) {
+                    if(pieInterWidth != 0) {
                         canvas.drawArc(outRectF, startPie*showProgress, pie.getSweepAngle()*showProgress, true, paintInter);
                     }
                 }else {
                     // =============== 画 饼图的扇形=====================
                     canvas.drawArc(oval, startPie*showProgress, pie.getSweepAngle()*showProgress, true, mPaint);
-                    if(pieInterWidth!=0) {
+                    if(pieInterWidth != 0) {
                         canvas.drawArc(oval, startPie*showProgress, pie.getSweepAngle()*showProgress, true, paintInter);
                     }
                 }
@@ -495,7 +480,7 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
                 down_y = event.getY();
                 // 当 该点 不再饼图内的画 说明没点中饼图 （应该在 down处处理 后续就不需要处理）
                 double c = Math.sqrt(( Math.pow(( down_x-centX ), 2) )+Math.pow(( down_y-centY ), 2));
-                if(c>( just*1f/2 )-padings) {
+                if(c>pieRadius) {
                     return false;// 父类的 down事件处理逻辑就不会执行 因为super在下面
                 }
 
@@ -528,7 +513,7 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
 
                 // 当 该点 不再饼图内的画 说明没点中饼图 （应该在 down处处理 后续就不需要处理）
                 double c3 = Math.sqrt(( Math.pow(( down_x-centX ), 2) )+Math.pow(( down_y-centY ), 2));
-                if(c3>( just*1f/2 )-padings) {
+                if(c3>pieRadius) {
                     // TODO
                     cleanWire = true;// 清除 所you提示线条
                     return true;// 父类的 down事件处理逻辑就不会执行 因为super在下面
@@ -547,7 +532,7 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
 
                 // 当 该点 不再饼图内的画 说明没点中饼图 （应该在 down处处理 后续就不需要处理）
                 double c1 = Math.sqrt(( Math.pow(( up_x-centX ), 2) )+Math.pow(( up_y-centY ), 2));
-                if(c1>( just*1f/2 )-padings) {
+                if(c1>pieRadius) {
                     return true;// 直接return
                 }else {
                     action = "up";
@@ -884,6 +869,7 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
      * 扇形之间的间隔 是个角度 默认2
      */
     public void setPieInterWidth(int pieInterWidth){
+        pieInterWidth = pieInterWidth>TsOut-pointPieOut ? (int)( TsOut-pointPieOut-10 ) : pieInterWidth;
         paintInter.setStrokeWidth(pieInterWidth);
     }
 
@@ -929,21 +915,6 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
         }
     }
 
-    /**
-     * 控件局四周的距离 默认20
-     */
-    public int getPadings(){
-        return padings;
-    }
-
-    /**
-     * 控件局四周的距离 默认20
-     */
-    //    public void setPadings(int padings) {
-    //        // TODO
-    //        lpading = padings - TsOut; // 提示线突出饼图至少20
-    //        this.padings = padings;
-    //    }
 
     /**
      * 指定的特殊角度 当某个扇形位于该角度是 该扇形变大 该值 为0 的时候 不变大 默认为0
@@ -970,11 +941,7 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
      * 指定的某个 扇形 突出的大小 内部有处理 该值过大的情况（一般不修改）
      */
     public void setPointPieOut(float pointPieOut){
-        // 防止这个 突出的值过大
-        pointPieOut = pointPieOut>padings ? padings : pointPieOut;
-        // 防止 突出的扇形半径 大于 提示线半径
-        pointPieOut = TsOut-pointPieOut<15 ? TsOut-15 : pointPieOut;
-        this.pointPieOut = pointPieOut;
+        //        this.pointPieOut = pointPieOut;
     }
 
     /**

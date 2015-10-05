@@ -41,6 +41,31 @@
         <attr name="pieInterWidth" format="dimension"/>
         <!--背景颜色-->
         <attr name="piebackground" format="color"/>
+        <!--特殊的角度- 默认0 -->
+        <attr name="specialAngle" format="integer"/>
+        <!--移动的时候显示突出的扇形还是手指提起的时候才显示-->
+        <attr name="outMoving" format="boolean"/>
+        <!--是否支持扇形的选中突出效果 默认true-->
+        <attr name="PieSelector" format="boolean"/>
+        <!--选中的扇形 突出部分长度-->
+        <attr name="pointPieOut" format="dimension"/>
+
+        <!--是否显示提示线-->
+        <attr name="showLine" format="boolean"/>
+        <!--显示所有提示线-->
+        <attr name="showCenterAll" format="boolean"/>
+        <!--提示线居中显示 默认true-->
+        <attr name="showInCenAngle" format="boolean"/>
+        <!--旋转的时候显示提示线条 将会使提示线的动画失效-->
+        <attr name="movingShowTX" format="boolean"/>
+        <!--提示线条的宽度-->
+        <attr name="TsWidth" format="dimension"/>
+        <!--提示线颜色-->
+        <attr name="TsColor" format="color"/>
+        <!--提示线字体的大小-->
+        <attr name="TtextSize" format="dimension"/>
+        <!--提示线横线部分的长度-->
+        <attr name="TshLong" format="dimension"/>
     </declare-styleable
         >
 </resources>
