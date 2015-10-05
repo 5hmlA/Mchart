@@ -5,6 +5,7 @@ import android.animation.ObjectAnimator;
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -16,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
 
+import com.refuse.mchar.R;
 import com.refuse.mchar.bean.Apiece;
 import com.refuse.mchar.utills.Logger;
 
@@ -260,6 +262,14 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
 
     public MPie(Context context, AttributeSet attrs, int defStyleAttr){
         super(context, attrs, defStyleAttr);
+        if(attrs != null) {
+            TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MPieView, defStyleAttr, 0);
+            pieInterColor = typedArray.getColor(R.styleable.MPieView_pieInterColor, Color.WHITE);
+            pieInterWidth = (int)typedArray.getDimension(R.styleable.MPieView_pieInterColor, 0);
+            backColor = typedArray.getColor(R.styleable.MPieView_piebackground, Color.TRANSPARENT);
+            typedArray.recycle();
+        }
+//        paintInter.setColor(pieInterColor); 出错 why？？
         init();
     }
 
@@ -273,12 +283,18 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
 
     public void init(){
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintInter = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintInter.setStyle(Paint.Style.STROKE);
         titleP = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paintInter = new Paint(Paint.ANTI_ALIAS_FLAG);
+        // 初始化一些画笔设置 可以外部改变的变量的初始化不要放在构造函数中
+        // 设置间隔画笔风格
+        paintInter.setStyle(Paint.Style.STROKE);
+        paintInter.setColor(pieInterColor);
+        // 画笔的宽度怎么画 与画笔宽度为0 相比 就是在画笔宽度为0的基础上左右各加粗宽度的一半
+        paintInter.setStrokeWidth(pieInterWidth);
     }
 
     /**
+     * 只有在 控件大小被改变的时候 才会被调用
      * 此时 获取控件的 宽高
      * onSizeChanged 在ondraw之前调用 一般 onSizeChanged调用之后可以认为 (在非onDraw中)控件显示了
      */
@@ -305,20 +321,12 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
 
         pieRadius = just/2-padings;
 
-        // 初始化一些画笔设置 可以外部改变的变量的初始化不要放在构造函数中
-        // 设置间隔画笔风格
-        paintInter.setStyle(Paint.Style.STROKE);
-        paintInter.setColor(pieInterColor);
-
-
         fillOutRectF = new RectF(centX-fillouting, centY-fillouting, centX+fillouting, centY+fillouting);
         arcRectF = new RectF(centX-pieRadius, centY-pieRadius, centX+pieRadius, centY+pieRadius);
         outRectF = new RectF(centX-pieRadius-pointPieOut, centY-pieRadius-pointPieOut, centX+pieRadius+pointPieOut,
                 centY+pieRadius+pointPieOut);
 
 
-        // 画笔的宽度怎么画 与画笔宽度为0 相比 就是在画笔宽度为0的基础上左右各加粗宽度的一半
-        paintInter.setStrokeWidth(pieInterWidth);
 
         // 当背景为透明的时候 获取布局的背景色
         if(Integer.MAX_VALUE == backColor) {
@@ -338,10 +346,12 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
         }
     }
 
+    //动画需要的属性
     public float getShowProgress(){
         return showProgress;
     }
 
+    //动画需要的属性
     public void setShowProgress(float showProgress){
         this.showProgress = showProgress;
         postInvalidate();
@@ -351,15 +361,11 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
     protected void onDraw(Canvas canvas){
 
         // 无论控件 那边大 都在中间的正方形画饼图
-        float mWidth = 0;// 宽比高宽多少
-        float mHeight = 0;// 高比宽高多少
 
         // 画背景
-        mPaint.setColor(backColor);
-        RectF back = new RectF(0, 0, width, height);
-
-        canvas.drawRect(back, mPaint);
-        mWidth = mHeight = just;
+//        mPaint.setColor(backColor);
+//        RectF back = new RectF(0, 0, width, height);
+//        canvas.drawRect(back, mPaint);
 
         //        // 画标题
         //        float measureText = titleP.measureText(pieTiele);
@@ -387,11 +393,6 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
         // paint.setColor(Color.RED);
         // canvas.drawRect(oval, paint);
 
-        // 画饼图扇形========== 间隔 ============= 所需要的 矩形
-        RectF ovalInter = new RectF(padings-pieInterWidth/2+mWidth/2, padings-pieInterWidth/2+mHeight/2,
-                width-padings+pieInterWidth/2-mWidth/2, height-padings+pieInterWidth/2-mHeight/2);
-
-
         // TODO
         // 将 提示线的起点 设定到 饼图半径的一半处
         if(nRadius == 1) {
@@ -417,7 +418,12 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
             if(PieSelector && clickPosition == i && ( outMoving ? true : "up".equals(action) )) {
                 // 提起时 选中的扇形变大
                 canvas.drawArc(outRectF, startPie*showProgress, pie.getSweepAngle()*showProgress, true, mPaint);
-            }else {
+
+                if(pieInterWidth!=0) {
+                    canvas.drawArc(outRectF, startPie*showProgress, pie.getSweepAngle()*showProgress, true, paintInter);
+                }
+
+            }else {//没选中--(特殊角度？普通扇形)
                 // = 画 =====特殊角度处===== 突出的扇形 ======当需要的时候new出新的RectF
                 if(specialAngle>0 && ( ( end>specialAngle && startPie<specialAngle ) || ( ( end>specialAngle || startPie<specialAngle ) && ( end<startPie ) ) )) {
                     // 设置监听
@@ -428,9 +434,15 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
                     PieSelector = false;
                     // 画突出扇形
                     canvas.drawArc(outRectF, startPie*showProgress, pie.getSweepAngle()*showProgress, true, mPaint);
+                    if(pieInterWidth!=0) {
+                        canvas.drawArc(outRectF, startPie*showProgress, pie.getSweepAngle()*showProgress, true, paintInter);
+                    }
                 }else {
                     // =============== 画 饼图的扇形=====================
                     canvas.drawArc(oval, startPie*showProgress, pie.getSweepAngle()*showProgress, true, mPaint);
+                    if(pieInterWidth!=0) {
+                        canvas.drawArc(oval, startPie*showProgress, pie.getSweepAngle()*showProgress, true, paintInter);
+                    }
                 }
             }
         }
@@ -670,22 +682,20 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
         for(Apiece pie : pieData2) {
             totalData += pie.getNum();
         }
-        float totalAngle = 360-pieInterWidth*pieData2.size();
-        float startAngle = pieInterWidth;
+        float totalAngle = 360-0*pieData2.size();
+        float startAngle = 0;
         //计算角度
         for(Apiece pie : pieData2) {
             float sweepAngle = pie.getNum()/totalData*totalAngle;
             pie.setStartAngle(startAngle);
             pie.setSweepAngle(sweepAngle);
-            startAngle += sweepAngle+pieInterWidth;
+            startAngle += sweepAngle;
         }
         this.pieData = pieData2;
         if(pieData2.get(0).getPieColor() == Integer.MAX_VALUE) {
             setEachPieColor();
         }
         extraDataInit();
-
-
         postInvalidate();
     }
 
@@ -874,7 +884,7 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
      * 扇形之间的间隔 是个角度 默认2
      */
     public void setPieInterWidth(int pieInterWidth){
-        this.pieInterWidth = pieInterWidth;
+        paintInter.setStrokeWidth(pieInterWidth);
     }
 
     /**
@@ -902,6 +912,21 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
     public void setDegrees(float degrees){
         this.degrees = degrees;
         rotedAngle = degrees;
+        //刷新提示线
+        if(( selectedPosition != -1 || down_x != -1 || down_y != -1 ) && selectedPosition<pieData.size()) {
+            if(showInCenAngle) {
+                showCenterGetPoint();
+            }else {
+                showAtTouch(down_x, down_y);
+            }
+            if(AniLine) {
+                drawAniLine(Tstarty, turnY);
+            }
+        }else {
+            //重置提示状态 饼图的选中状态 因为数据变了 选中的位置可能不存在
+            selectedPosition = -1;
+            down_x = down_y = -1;
+        }
     }
 
     /**
@@ -1155,7 +1180,7 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
      * @param pieInterColor
      */
     public void setPieInterColor(int pieInterColor){
-        this.pieInterColor = pieInterColor;
+        paintInter.setColor(pieInterColor);
     }
 
     /**

@@ -67,7 +67,7 @@ public class MProgressBall extends View {
     private float mTextSize = DisplayUtils.sp2px(getContext(), 20);
     public long ANIDURATION = 5000;
     private TimeInterpolator Interpolator = new DecelerateInterpolator();
-    private ValueAnimator mAnimator = new ValueAnimator();
+    public ValueAnimator mAnimator = new ValueAnimator();
     private float textCurrent;
     private List<Integer> mTierColor = new ArrayList<>();
 
@@ -166,7 +166,7 @@ public class MProgressBall extends View {
         for(int i = 0; i<mTier; i++) {
             Paint tierPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             tierPaint.setColor(mTierColor.get(i));
-            //            tierPaint.setAlpha(255-10*mTier);
+//            tierPaint.setAlpha(255-10*mTier);
             canvas.drawArc(mProgressArc, 0, 360, false, tierPaint);
         }
         progressCurrent = textCurrent-( textCurrent == progressMax*mTier ? 0 : mTier )*progressMax;//进度条进度 解决超过100%部分
@@ -178,7 +178,6 @@ public class MProgressBall extends View {
         float sweep = (float)( acos*2 );
         if(mTierColor.size()>0 && mTierColor.size()>mTier) {
             mPaint.setColor(mTierColor.get(mTier));
-            //            mPaint.setAlpha(15);
         }
         canvas.drawArc(mProgressArc, start, sweep, false, mPaint);
 

@@ -80,7 +80,7 @@ public class WarmLine extends View {
     /**
      * 提示线 的转折点坐标 横方向的起点坐标 斜线的终点坐标 斜线与外圆的交点坐标
      */
-    private float turnY;
+    protected float turnY;
     /**
      * 提示线 横方向的终点坐标
      */
@@ -169,7 +169,7 @@ public class WarmLine extends View {
     private Paint mPaint;
     private Paint pLine;
     private float Tstartx;
-    private float Tstarty;
+    protected float Tstarty;
     // 动画展示 提示线 斜线部分
     //    private boolean drawAniLine;
 
@@ -413,7 +413,7 @@ public class WarmLine extends View {
         return super.dispatchTouchEvent(event);
     }
 
-    private void showAtTouch(float x, float y){
+    protected void showAtTouch(float x, float y){
         //获取起点坐标
         if(TstartAtTouch) {
             Tstartx = x;
@@ -447,7 +447,7 @@ public class WarmLine extends View {
     /**
      * 获取当前选中的扇形 应该显示提示线的 各点坐标
      */
-    private void showCenterGetPoint(){
+    protected void showCenterGetPoint(){
         if(anglesList.size() == 0 || showMsg.size() == 0) {
             throw new RuntimeException("数据不足请先设置数据。。。调用setPieAngles()");
         }
@@ -643,6 +643,7 @@ public class WarmLine extends View {
             }
 
 
+            //刷新当前选中的 扇形所有的提示线坐标
             if(( selectedPosition != -1 || down_x != -1 || down_y != -1 ) && selectedPosition<showDatas.size()) {
                 if(showInCenAngle) {
                     showCenterGetPoint();

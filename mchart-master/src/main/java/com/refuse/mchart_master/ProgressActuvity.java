@@ -20,6 +20,12 @@ public class ProgressActuvity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progress);
         mBall = (MProgressBall)findViewById(R.id.progress);
+        mBall.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view){
+                mBall.mAnimator.cancel();
+            }
+        });
         mPm = (MProgressWidthMsg)findViewById(R.id.progress_msg);
         mPm.setCurrentPercent(89.99f);
 //        mPm.setCurrent(89.99f);
