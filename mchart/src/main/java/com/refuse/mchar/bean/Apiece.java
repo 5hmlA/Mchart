@@ -52,7 +52,7 @@ public class Apiece {
     /**
      * 颜色随机
      *
-     * @param num
+     * @param num 颜色值
      */
     public Apiece(Float num) {
         this.pieColor = getRanColor();

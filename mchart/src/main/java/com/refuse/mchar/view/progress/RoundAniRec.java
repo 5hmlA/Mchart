@@ -1,7 +1,5 @@
 package com.refuse.mchar.view.progress;
 
-import java.util.Random;
-
 import android.animation.TimeInterpolator;
 import android.animation.ValueAnimator;
 import android.animation.ValueAnimator.AnimatorUpdateListener;
@@ -13,8 +11,9 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.animation.AccelerateInterpolator;
 import android.view.animation.BounceInterpolator;
+
+import java.util.Random;
 
 @SuppressLint("DrawAllocation")
 public class RoundAniRec extends View {
@@ -219,7 +218,7 @@ public class RoundAniRec extends View {
 	/**
 	 * 设置进度条的颜色 默认 随机 设置为透明的话 颜色也将变为随机
 	 * 
-	 * @param recColor
+	 * @param recColor 矩形颜色
 	 */
 	public void setRecColor(int recColor) {
 		this.recColor = recColor;
@@ -233,7 +232,7 @@ public class RoundAniRec extends View {
 	/**
 	 * 设置动画显示的时长
 	 * 
-	 * @param aNI_TIME
+	 * @param ANI_TIME 设置动画显示的时长
 	 */
 	public void setANI_TIME(long ANI_TIME) {
 		this.ANI_TIME = ANI_TIME;
@@ -247,7 +246,7 @@ public class RoundAniRec extends View {
 	/**
 	 * 默认 maxProgress 为100
 	 * 
-	 * @param maxProgress
+	 * @param progressMax 默认 maxProgress 为100
 	 */
 	public void setMaxProgress(float progressMax) {
 		this.progressMax = progressMax;
@@ -258,7 +257,7 @@ public class RoundAniRec extends View {
 	 * 可在控件显示的时候执行动画  可在控件显示之后执行动画
 	 * 默认最大进度progressMax = 100
 	 * 
-	 * @param currentProgress
+	 * @param currentProgress 进度条进度 执行动画
 	 */
 	public void setAniCurrentProgress(float currentProgress) {
 		this.currentProgress = currentProgress;
@@ -275,7 +274,7 @@ public class RoundAniRec extends View {
 	 * 可在控件显示的时候执行动画  可在控件显示之后执行动画
 	 * 默认最大进度progressMax = 100
 	 * 
-	 * @param lastProgress	//进度上次的位置
+	 * @param lastProgress	进度上次的位置
 	 * @param currentProgress
 	 */
 	public void setAniCurrentProgress(float lastProgress,float currentProgress) {
@@ -291,7 +290,7 @@ public class RoundAniRec extends View {
 	/**
 	 * 设置进度条进度 无动画
 	 * 
-	 * @param currentProgress
+	 * @param currentProgress 当前进度值
 	 */
 	public void setCurrentProgress(float currentProgress) {
 		this.currentProgress = currentProgress;
@@ -314,7 +313,7 @@ public class RoundAniRec extends View {
 	/**
 	 * 设置 圆角矩形 圆角半径 如过设置过大 那么 就默认为短边的一半 rx ry 任意一个为0 就为直角矩形
 	 * 
-	 * @param ry
+	 * @param rx 圆角矩形 圆角半径
 	 */
 	public void setRx(float rx) {
 		this.rx = rx;
@@ -327,7 +326,7 @@ public class RoundAniRec extends View {
 	/**
 	 * 设置 圆角矩形 圆角半径 rx ry 任意一个为0 就为直角矩形 任意一个为 负数 则矩形不显示
 	 * 
-	 * @param ry
+	 * @param ry 圆角半径
 	 */
 	public void setRy(float ry) {
 		this.ry = ry;

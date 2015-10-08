@@ -66,6 +66,8 @@
         <attr name="TtextSize" format="dimension"/>
         <!--提示线横线部分的长度-->
         <attr name="TshLong" format="dimension"/>
+        <!--外辅助圆局四周的边距 也就是 提示线转折点距离边框的最小距离-->
+        <attr name="lpading" format="dimension"/>
     </declare-styleable
         >
 </resources>

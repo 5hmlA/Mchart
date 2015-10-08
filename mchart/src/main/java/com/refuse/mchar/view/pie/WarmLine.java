@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * @author yun
  * @version 1
- * @Time 2015/7/4
+ * Time 2015/7/4
  * 无论控件是否是正方形 都在中间部分画图
  * 提示线 分为 斜线部分和 横线部分
  * showLine 是否显示 提示线的总开关（默认true 默认显示）
@@ -189,12 +189,13 @@ public class WarmLine extends View {
     /**
      * 提示文字大小
      */
-    protected float TtextSize = 40;
+    protected float TtextSize = 30;
     private ValueAnimator valueAnimator = new ValueAnimator();
     /**
      * 按下的时候 去掉所有提示线条
      */
     private boolean downCleanLine = true;
+    private RectF mOval4;
 
     public WarmLine(Context context, AttributeSet attrs, int defStyleAttr){
         super(context, attrs, defStyleAttr);
@@ -202,9 +203,10 @@ public class WarmLine extends View {
         if(attrs != null) {
             TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.MPieView, defStyleAttr, 0);
             TsColor = typedArray.getColor(R.styleable.MPieView_TsColor, Color.BLACK);
-            TtextSize = typedArray.getDimension(R.styleable.MPieView_TtextSize, 40);
+            TtextSize = typedArray.getDimension(R.styleable.MPieView_TtextSize, 30);
             TsWidth = typedArray.getDimension(R.styleable.MPieView_TsWidth, 1);
             TshLong = typedArray.getDimension(R.styleable.MPieView_TshLong, 0);
+            lpading = typedArray.getDimension(R.styleable.MPieView_lpading, 0);
             showLine = typedArray.getBoolean(R.styleable.MPieView_showLine, true);
             showCenterAll = typedArray.getBoolean(R.styleable.MPieView_showCenterAll, false);
             showInCenAngle = typedArray.getBoolean(R.styleable.MPieView_showInCenAngle, true);
@@ -247,7 +249,14 @@ public class WarmLine extends View {
         //初始化
         pLine.setStrokeWidth(TsWidth);
         pLine.setColor(TsColor);
+
         textP.setTextSize(TtextSize);
+
+        //设置的testsize并不等于 画出来文字的高度
+        //        Rect bouds = new Rect();
+        //        textP.getTextBounds("343", 0, "232".length(), bouds);
+        //        System.out.println(bouds.height()+"........."+TtextSize);
+
     }
 
     // down的时候 清除所有提示线 move过则 up的时候 不显示提示线
@@ -272,10 +281,11 @@ public class WarmLine extends View {
         if(showW) {
             // 画 提示线转折点所在的 辅助 圆
             mPaint.setStyle(Style.STROKE);
-            RectF oval4 = new RectF(mWidth/2+lpading, mHeight/2+lpading, just+mWidth/2-lpading, just+mHeight/2-lpading);
+            mOval4 = mOval4 != null ? mOval4 : new RectF(mWidth/2+lpading, mHeight/2+lpading, just+mWidth/2-lpading,
+                    just+mHeight/2-lpading);
             // 计算 外 辅助 圆的半径
             wRadius = just/2-lpading;
-            canvas.drawArc(oval4, 0, 360, true, mPaint);
+            canvas.drawArc(mOval4, 0, 360, true, mPaint);
 
             //画内辅助圆
             canvas.drawCircle(centX, centY, nRadius, mPaint);
@@ -469,6 +479,9 @@ public class WarmLine extends View {
     protected void showCenterGetPoint(){
         if(anglesList.size() == 0 || showMsg.size() == 0) {
             throw new RuntimeException("数据不足请先设置数据。。。调用setPieAngles()");
+        }
+        if(selectedPosition == -1 || selectedPosition>=anglesList.size()) {
+            return;
         }
         float cenAngle = anglesList.get(selectedPosition)+rotedAngle;
         cenAngle = cenAngle>360 ? cenAngle-360 : cenAngle;
@@ -727,11 +740,19 @@ public class WarmLine extends View {
         showLine = showLineTemp = true;
         showInCenAngle = showCenterAll ? showCenterAll : showInCenAngle;
         this.showCenterAll = showCenterAll;
-        if(selectedPosition != -1) {
-            showCenterGetPoint();
-        }
-        if(AniLine) {
-            drawAniLine(Tstarty, turnY);
+        if(( selectedPosition != -1 || down_x != -1 || down_y != -1 ) && selectedPosition<anglesList.size()) {
+            if(showInCenAngle) {
+                showCenterGetPoint();
+            }else {
+                showAtTouch(down_x, down_y);
+            }
+            if(AniLine) {
+                drawAniLine(Tstarty, turnY);
+            }
+        }else {
+            //重置提示状态 饼图的选中状态 因为数据变了 选中的位置可能不存在
+            selectedPosition = -1;
+            down_x = down_y = -1;
         }
         postInvalidate();
     }
@@ -841,6 +862,7 @@ public class WarmLine extends View {
      */
     public void setMovingShowTX(boolean movingShowTX){
         this.movingShowTX = movingShowTX;
+        AniLine = !movingShowTX;
     }
 
     public boolean isMovingShowTX(){

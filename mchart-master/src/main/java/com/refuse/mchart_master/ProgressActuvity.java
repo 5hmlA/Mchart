@@ -20,6 +20,15 @@ public class ProgressActuvity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progress);
         mBall = (MProgressBall)findViewById(R.id.progress);
+        mBall.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view){
+                mBall.mAnimator.cancel();
+                mBall.setProgressMode(mBall.getProgressMode()==0?1:0);
+                mBall.postInvalidate();
+                return true;
+            }
+        });
         mBall.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view){

@@ -260,7 +260,7 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
             pieInterColor = typedArray.getColor(R.styleable.MPieView_pieInterColor, Color.WHITE);
             pieInterWidth = (int)typedArray.getDimension(R.styleable.MPieView_pieInterColor, 0);
             pointPieOut = typedArray.getDimension(R.styleable.MPieView_pointPieOut, 0);
-            backColor = typedArray.getColor(R.styleable.MPieView_piebackground, Color.TRANSPARENT);
+            backColor = typedArray.getColor(R.styleable.MPieView_piebackground, Color.WHITE);
             specialAngle = typedArray.getInt(R.styleable.MPieView_specialAngle, 0);
             outMoving = typedArray.getBoolean(R.styleable.MPieView_outMoving, false);
             PieSelector = typedArray.getBoolean(R.styleable.MPieView_PieSelector, true);
@@ -353,11 +353,11 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
         // 无论控件 那边大 都在中间的正方形画饼图
 
         // 画背景
-        //        mPaint.setColor(backColor);
-        //        RectF back = new RectF(0, 0, width, height);
-        //        canvas.drawRect(back, mPaint);
+        mPaint.setColor(backColor);
+        RectF back = new RectF(0, 0, width, height);
+        canvas.drawRect(back, mPaint);
 
-        //        // 画标题
+//        // 画标题
         //        float measureText = titleP.measureText(pieTiele);
         //        Rect bounds = new Rect();
         //        titleP.getTextBounds(pieTiele, 0, pieTiele.length(), bounds);
@@ -431,8 +431,7 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
                 }
             }
         }
-        super.onDraw(canvas);//先画父类提示线条   //或者放最后 通过修改画提示线的颜色 来让提示线在展示动画之后出现
-
+        //        super.onDraw(canvas);//先画父类提示线条   //或者放最后 通过修改画提示线的颜色 来让提示线在展示动画之后出现
         //==================================饼图的展现动画===========================================
         if(pieshowani == PieShowAnimation.SCANNING && showPieAnimation) { // 不执行fillOut动画 同时 允许出现饼图展现动画
             // 则执行扇形扫描动画
@@ -444,7 +443,7 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
                 canvas.drawArc(oval4, start4, sweep4, true, mPaint);
             }
         }
-        //		super.onDraw(canvas);// 通过修改画提示线的颜色 来让提示线在展示动画之后出现
+        super.onDraw(canvas);// 通过修改画提示线的颜色 来让提示线在展示动画之后出现
     }
 
     //    public void drawSpecialPie(Canvas canvas, float mWidth, float mHeight, Apiece pie, float startPie, float outORin){
@@ -775,7 +774,6 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
      * 第一次展现 饼图的动画
      */
     public void aniShowPie(){
-        Logger.i("显示控件前设置变量代码执行顺序", "饼图展现动画--aniShowPie()");
         mAnimator.cancel();
         mAnimator.setDuration(PIEANITIME);
         mAnimator.setInterpolator(pieInterpolator);
@@ -896,6 +894,7 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
      * @param degrees
      */
     public void setDegrees(float degrees){
+        degrees = degrees>360 ? degrees-360*(int)( ( degrees/360 ) ) : degrees;
         this.degrees = degrees;
         rotedAngle = degrees;
         //刷新提示线
@@ -913,6 +912,7 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
             selectedPosition = -1;
             down_x = down_y = -1;
         }
+        postInvalidate();
     }
 
 
@@ -1085,15 +1085,18 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
      * @param ani
      */
     public void setPieShowAnimation(PieShowAnimation ani){
+        showPieAnimation = true;
         pieshowani = ani;
         switch(ani) {
-            case SCANNING:
-                break;
-            case FILLOUTING:
-                break;
             case NONE:
                 showPieAnimation = false;
                 break;
+            case SCANNING:
+                postInvalidate();
+                break;
+            case FILLOUTING:
+                break;
+
         }
     }
 
