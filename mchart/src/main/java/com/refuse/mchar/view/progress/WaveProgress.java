@@ -15,7 +15,7 @@ import android.view.animation.OvershootInterpolator;
 import java.util.Random;
 
 /**
- * Created by jwx272428 on 2015/10/7.
+ * Created by jonas on 2015/10/7.
  */
 public class WaveProgress extends View {
 
@@ -104,6 +104,7 @@ public class WaveProgress extends View {
         wRadius = wRadius == 0 ? mJust/2 : wRadius;
         backPath.addCircle(mCenx, mCeny, wRadius, Path.Direction.CCW);
 
+//        range = wRadius
     }
 
     @Override

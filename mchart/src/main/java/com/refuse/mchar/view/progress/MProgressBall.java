@@ -44,7 +44,7 @@ public class MProgressBall extends View {
     /**
      * onDraw中使用的进度 动画使用的进度
      */
-//    private float progressCurrent;
+    //    private float progressCurrent;
     /**
      * 设置的 进度
      */
@@ -58,10 +58,13 @@ public class MProgressBall extends View {
      * 长宽中较短一个 也是球的直径
      */
     private int mJust;
+    /**
+     * 小球中心点 坐标
+     */
     private PointF mCenter;
     private RectF mProgressArc;
     private DecimalFormat numFormat;
-    private Rect bounds = new Rect();
+
     private Paint mTextPaint;
     private int textColor;
     /**
@@ -79,8 +82,6 @@ public class MProgressBall extends View {
      * 超过100%的多少层
      */
     private int mTier;
-    private float mCenx;
-    private float mCeny;
     /**
      * 用来剪切 圆画布的路劲
      */
@@ -92,7 +93,7 @@ public class MProgressBall extends View {
     /**
      * 波浪振幅
      */
-    private float range = 20;
+    private float range;
     /**
      * 存放原始的 波浪振幅
      */
@@ -107,18 +108,24 @@ public class MProgressBall extends View {
      */
     private float waveMove = 0;
     /**
-     * 存放
-     */
-    private float waveMoveTemp = 0;
-    /**
      * 波纹 移动产生波浪效果 需要的变量
      * 移动的速度
+     * 可能出现的最大速度是设置的2倍
      */
-    private double waveSpeed = 5;
+    private double waveSpeed;
     /**
      * 关闭 波纹的 滚动波浪效果
      */
     private boolean stopWaving = false;
+    /**
+     * 波峰波谷的数量
+     * 也能达到 调节速度的效果 值越大速度看着越快
+     */
+    private double waveNum = 3;
+    /**
+     * 显示辅助进度直线  实际的进度
+     */
+    private boolean showProgressLine = true;
 
     {
         backPath = new Path();
@@ -175,14 +182,16 @@ public class MProgressBall extends View {
         mHeight = getHeight();
         mJust = mWidth>mHeight ? mHeight : mWidth;
         radius = radius == 0 ? mJust/2 : radius;
-        mCenx = mWidth/2f;
-        mCeny = mHeight/2f;
         mBackPaint.setColor(ballgroundColor);
         mPaint.setColor(progressColor);
         mTextPaint.setColor(textColor);
         mCenter = new PointF(mWidth/2, mHeight/2);
         mProgressArc = new RectF(mCenter.x-mJust/2, mCenter.y-mJust/2, mCenter.x+mJust/2, mCenter.y+mJust/2);
-        backPath.addCircle(mCenx, mCeny, radius, Path.Direction.CCW);
+        backPath.addCircle(mCenter.x, mCenter.y, radius, Path.Direction.CCW);
+
+        //设置一些默认值
+        range = rangeTemp = range != 0 ? range : radius/15f;
+        waveSpeed = waveSpeed != 0 ? waveSpeed : radius/50f;
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -213,10 +222,11 @@ public class MProgressBall extends View {
             drawWaveProgress(canvas, progressCurrent);
         }else {
             //画进度
-            drawProgress(canvas,progressCurrent);
+            drawProgress(canvas, progressCurrent);
         }
 
         String currMsg = numFormat.format(textCurrent/progressMax);
+        Rect bounds = new Rect();
         mTextPaint.getTextBounds(currMsg, 0, currMsg.length(), bounds);
         mTextPaint.setTextSize(mTextSize);
         canvas.drawText(currMsg, mCenter.x-bounds.width()/2, mCenter.y+bounds.height()/2, mTextPaint);
@@ -225,37 +235,39 @@ public class MProgressBall extends View {
 
     private void drawWaveProgress(Canvas canvas, float progressCurrent){
 
-        float progress = mJust/progressMax*progressCurrent;
-
         //mCeny+wRadius-cProgress 为当前进度 所在的y轴坐标
-        float currentY = mCeny+radius-progressCurrent/progressMax*radius*2;
+        float currentY = mCenter.y+radius-progressCurrent/progressMax*radius*2;
         wPath.reset();
-        wPath.moveTo(0, currentY);//起点
+        wPath.moveTo(mCenter.x-radius, currentY);//起点
 
         //波浪进度 的path
-        for(int i = (int)( mCenx-radius ); i<=mCenx+radius; i++) {
+        for(int i = (int)( mCenter.x-radius ); i<=mCenter.x+radius; i++) {
             //            range = mRandom.nextInt(30)+10; //打开 会出现较大的锯齿 有点像声波
             //画cos曲线  cos曲线往左或者往右一直移动出现波浪波动效果
-            wPath.lineTo(i, currentY+range*(float)Math.cos(( i+waveMove )*( 480f/( mCenx+radius ) )*Math.PI/180f));
+            wPath.lineTo(i, currentY+range*(float)Math.cos(( i+waveMove )*( waveNum*180f/( 2*radius ) )*Math.PI/180f));
         }
-        wPath.lineTo(mWidth, mHeight);//右下角
-        wPath.lineTo(0, mHeight);//左下角  之后会闭合到起点
+        wPath.lineTo(mCenter.x+radius, mCenter.y+radius);//右下角
+        wPath.lineTo(mCenter.x-radius, mCenter.y+radius);//左下角  之后会闭合到起点
         if(mTierColor.size()>0 && mTierColor.size()>mTier) {
             mPaint.setColor(mTierColor.get(mTier));
         }
         //画波浪进度
         canvas.drawPath(wPath, mPaint);
 
-        //中间线条
-        canvas.drawLine(0, currentY, mWidth, currentY, mBackPaint);
+
+        if(showProgressLine) {
+            //中间线条  显示辅助的进度线条 也就是实际的进度
+            canvas.drawLine(0, currentY, mWidth, currentY, mBackPaint);
+        }
         if(!stopWaving) {
-            waveMove += waveSpeed+mRandom.nextInt(10);
+            waveMove += waveSpeed+mRandom.nextInt((int)(waveSpeed));
+
             //当最后一层进度满100% 时波纹慢慢消失
-            if(progressCurrent == progressMax && mTier == (int)(pCurrent/progressMax)-1) {
+            if(progressCurrent == progressMax && mTier == (int)( pCurrent/progressMax )-1) {
                 //注意--range和 range-- 的区别
                 //range = range>0?--range:0;
                 if(range>0) {
-                    range = range-0.08f;
+                    range = range-rangeTemp/600f;//波浪1000ms之后平息
                     postInvalidate();
                 }
             }else {

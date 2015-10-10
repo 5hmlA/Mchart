@@ -26,6 +26,14 @@
             android:layout_height="20dp">
 
         </com.refuse.mchar.view.progress.MProgressWidthMsg>
+        <com.refuse.mchar.view.progress.RProgress
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"></com.refuse.mchar.view.progress.RProgress>
+        <com.refuse.mchar.view.progress.ChargingView
+            android:id="@+id/chv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"></com.refuse.mchar.view.progress.ChargingView>
     </LinearLayout>
 
     <com.refuse.mchar.layout.FlowLayout
