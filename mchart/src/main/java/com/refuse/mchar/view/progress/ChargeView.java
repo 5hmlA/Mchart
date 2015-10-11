@@ -11,13 +11,12 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
 /**
  *
  */
-public class ChargeView extends View {
+public class ChargeView extends Progress {
 
     private Paint mPaint;
     private int height;
@@ -34,7 +33,7 @@ public class ChargeView extends View {
     /**
      * 圆环 内字 的内容
      */
-    private String centerText = 90+"";
+    private float centerText ;
     /**
      * 圆环 内字 的大小
      */
@@ -86,7 +85,7 @@ public class ChargeView extends View {
         mOuterPath.addCircle(mCPoint.x, mCPoint.y, mJust/2-ringPading, Path.Direction.CW);
         mOuterPath.addCircle(mCPoint.x, mCPoint.y, mJust/2-ringPading-ringWidth, Path.Direction.CW);
         mOuterPath.setFillType(Path.FillType.EVEN_ODD);
-        sweepAngleTemp = startAngle;
+//        sweepAngleTemp = startAngle;
     }
 
     private double toRadian(float angle){
@@ -98,8 +97,9 @@ public class ChargeView extends View {
     protected void onDraw(Canvas canvas){
         super.onDraw(canvas);
 
-        canvas.save();
-        canvas.clipPath(mOuterPath);
+        canvas.save();//保存之前的画布
+
+        canvas.clipPath(mOuterPath);//剪切出圆环
 
         PointF mCircleStart = new PointF();
         mCircleStart.x = (float)( mRadius*Math.cos(toRadian(startAngle)) )+mCPoint.x;
@@ -126,8 +126,10 @@ public class ChargeView extends View {
         if(showRing) {
             drawProgress(canvas);
         }
-        canvas.restore();
-        drawProgressText(canvas);
+
+        canvas.restore();//恢复之前的画布
+
+//        drawProgressText(canvas);
     }
 
     private void drawProgress(Canvas canvas){
@@ -146,7 +148,9 @@ public class ChargeView extends View {
     }
 
     private void drawProgressText(Canvas canvas){
-        if(TextUtils.isEmpty(centerText)) {
+//        String curStr = numFormat.format(centerText*progress);
+        String curStr = centerText*progress+"";
+        if(TextUtils.isEmpty(curStr)) {
             //如过 文字为空的话 就不画
             return;
         }
@@ -156,17 +160,17 @@ public class ChargeView extends View {
         // mpaint.setTextSize(55);
         // C 语言 的思想
         Rect bounds = new Rect();
-        mPaint.getTextBounds(centerText, 0, centerText.length(), bounds);
+        mPaint.getTextBounds(curStr, 0, curStr.length(), bounds);
         // 获取 所画的字的宽和高
         // mpaint.measureText(text);//返回的是字的宽度
         int textWidth = bounds.width();
         int textHeight = bounds.height();
 
-        canvas.drawText(centerText, width/2-textWidth/2, height/2+textHeight/2, mPaint);
+        canvas.drawText(curStr, width/2-textWidth/2, height/2+textHeight/2, mPaint);
     }
 
     public void setAniSweepAngle(float sweepAngle){
-        this.sweepAngle = sweepAngleTemp = sweepAngle;
+        centerText = this.sweepAngle = sweepAngleTemp = sweepAngle;
         mProgress.cancel();
         mProgress = ObjectAnimator.ofFloat(this, "progress", 0, 1).setDuration(ANIDURATION);
         mProgress.setInterpolator(new AccelerateDecelerateInterpolator());
@@ -175,7 +179,7 @@ public class ChargeView extends View {
     }
 
     public void setAniSweepAngle(float sweepAngle, long delay){
-        this.sweepAngle = sweepAngleTemp = sweepAngle;
+        centerText = this.sweepAngle = sweepAngleTemp = sweepAngle;
         mProgress.cancel();
         mProgress = ObjectAnimator.ofFloat(this, "progress", 0, 1).setDuration(ANIDURATION);
         mProgress.setInterpolator(new AccelerateDecelerateInterpolator());
@@ -297,19 +301,19 @@ public class ChargeView extends View {
         this.textColor = textColor;
     }
 
-    /**
-     * @return 文字的内容
-     */
-    public String getCenterText(){
-        return centerText;
-    }
-
-    /**
-     * @return 文字的内容，当内容为空时 不显示 默认不显示
-     */
-    public void setCenterText(String centerText){
-        this.centerText = centerText;
-    }
+//    /**
+//     * @return 文字的内容
+//     */
+//    public String getCenterText(){
+//        return centerText;
+//    }
+//
+//    /**
+//     * @return 文字的内容，当内容为空时 不显示 默认不显示
+//     */
+//    public void setCenterText(String centerText){
+//        this.centerText = centerText;
+//    }
 
     /**
      * @return 文字的大小
