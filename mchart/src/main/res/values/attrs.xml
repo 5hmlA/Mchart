@@ -30,6 +30,11 @@
         <attr name="balltextColor" format="color"/>
         <attr name="progressMax" format="float"/>
         <attr name="progressCurrent" format="float"/>
+        <!--进度模式  0 波浪模式   1 直线普通模式-->
+        <attr name="progressMode" format="enum">
+            <enum name="wave" value="0"/>
+            <enum name="normal" value="1"/>
+        </attr>
         <attr name="balltextSize" format="dimension"/>
 
     </declare-styleable>

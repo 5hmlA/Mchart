@@ -150,6 +150,7 @@ public class MProgressBall extends View {
             textColor = typedArray.getColor(R.styleable.MProgressBall_balltextColor, Color.BLACK);
             progressMax = typedArray.getFloat(R.styleable.MProgressBall_progressMax, 100);
             pCurrent = typedArray.getFloat(R.styleable.MProgressBall_progressCurrent, 0);
+            progressMode = typedArray.getInt(R.styleable.MProgressBall_progressMode, 0);
             //获取字体大小
             mTextSize = typedArray.getDimensionPixelSize(R.styleable.MProgressBall_balltextSize, 40);
             //            mTextSize = typedArray.getDimension(R.styleable.MProgressBall_balltextSize, 30);
