@@ -13,7 +13,9 @@ dependencies {
 ```
 
 ##MProgressWidthMsg 
-相关自定义属性
+![](https://github.com/mychoices/Mchart/blob/master/image/msg.gif?raw=true)
+
+- 相关自定义属性
 ```
 <!--进度条颜色-->
 <attr name="recColor" format="color"></attr>
@@ -41,10 +43,12 @@ dependencies {
 ```
 setCurrentPercentAni(float current)//设置百分比进度 带有动画
 setCurrentAni(float current)//设置当前进度 带有动画
+setMax(float max)//设置总进度 默认100
 ```
 
 ##MProgressBall
-相关属性
+![](https://github.com/mychoices/Mchart/blob/master/image/ball.gif?raw=true)
+- 相关属性
 ```
 <attr name="progressColor" format="color"/>
 <attr name="backgroundColor" format="color"/>
@@ -58,3 +62,24 @@ setCurrentAni(float current)//设置当前进度 带有动画
 </attr>
 <attr name="balltextSize" format="dimension"/>
 ```
+###setCurrent
+~~~
+setProgressMode(int progressMode)//设置进度球模式 
+setProgressCurrentAni(float progressCurrent)//设置当前进度 含有动画
+setProgressCurrent(float progressCurrent)//设置当前进度 没有动画
+animateShow()//重新执行一下动画
+setProgressMax(float progressMax)//设置总进度  默认100
+~~~
+
+##ChargingView
+![](https://github.com/mychoices/Mchart/blob/master/image/charge.gif?raw=true)
+相关属性(后续添加)
+###setCurrent
+~~~
+setCurrent(float current)//设置当前进度 含有动画
+~~~
+
+-----
+##NEXT
+- 统一相关方法名字
+- 补充自定义属性
