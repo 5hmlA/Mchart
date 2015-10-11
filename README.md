@@ -79,6 +79,55 @@ setProgressMax(float progressMax)//设置总进度  默认100
 setCurrent(float current)//设置当前进度 含有动画
 ~~~
 
+##MPie
+![](https://github.com/mychoices/Mchart/blob/master/image/pie.gif?raw=true)
+- 相关属性
+~~~
+<!--间隔线的颜色-->
+<attr name="pieInterColor" format="color"/>
+<!--间隔线的宽度-->
+<attr name="pieInterWidth" format="dimension"/>
+<!--背景颜色-->
+<attr name="piebackground" format="color"/>
+<!--特殊的角度- 默认0 -->
+<attr name="specialAngle" format="integer"/>
+<!--移动的时候显示突出的扇形还是手指提起的时候才显示-->
+<attr name="outMoving" format="boolean"/>
+<!--是否支持扇形的选中突出效果 默认true-->
+<attr name="PieSelector" format="boolean"/>
+<!--选中的扇形 突出部分长度-->
+<attr name="pointPieOut" format="dimension"/>
+<!--是否显示提示线-->
+<attr name="showLine" format="boolean"/>
+<!--显示所有提示线-->
+<attr name="showCenterAll" format="boolean"/>
+<!--提示线居中显示 默认true-->
+<attr name="showInCenAngle" format="boolean"/>
+<!--旋转的时候显示提示线条 将会使提示线的动画失效-->
+<attr name="movingShowTX" format="boolean"/>
+<!--提示线条的宽度-->
+<attr name="TsWidth" format="dimension"/>
+<!--提示线颜色-->
+<attr name="TsColor" format="color"/>
+<!--提示线字体的大小-->
+<attr name="TtextSize" format="dimension"/>
+<!--提示线横线部分的长度-->
+<attr name="TshLong" format="dimension"/>
+<!--外辅助圆局四周的边距 也就是 提示线转折点距离边框的最小距离-->
+<attr name="lpading" format="dimension"/>
+~~~
+###相关方法
+
+	~~~
+	setShowCenterAll(boolean showall);//是否显示所有信息提示线条
+	setShowInCenAngle(boolean showInCenAngle2)//提示线条 扇形中心显示
+	setShowLine(boolean showLine)//是否显示提示线条
+	setPieShowAnimation(PieShowAnimation ani)//设置饼图的展示动画
+	setDegrees(float degrees)//设置饼图的旋转角度
+	setMovingShowTX(boolean movingShowTX)//设置旋转的时候是否显示提示线
+	setPieRotateable(boolean pieRotateable)//设置饼图是否可以旋转
+	~~~
+
 -----
 ##NEXT
 - 统一相关方法名字
