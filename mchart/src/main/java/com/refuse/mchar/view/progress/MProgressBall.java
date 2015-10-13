@@ -48,7 +48,7 @@ public class MProgressBall extends View {
     /**
      * 设置的 进度
      */
-    private float pCurrent;
+    private float pCurrent = 50;
     private float progressMax = 100;
     private Paint mBackPaint;
     private Paint mPaint;
@@ -126,6 +126,7 @@ public class MProgressBall extends View {
      * 显示辅助进度直线  实际的进度
      */
     private boolean showProgressLine = true;
+    private Path ballProPath;
 
     {
         backPath = new Path();
@@ -189,6 +190,8 @@ public class MProgressBall extends View {
         mCenter = new PointF(mWidth/2, mHeight/2);
         mProgressArc = new RectF(mCenter.x-mJust/2, mCenter.y-mJust/2, mCenter.x+mJust/2, mCenter.y+mJust/2);
         backPath.addCircle(mCenter.x, mCenter.y, radius, Path.Direction.CCW);
+        ballProPath = new Path();
+        ballProPath.addCircle(mCenter.x, mCenter.y, radius, Path.Direction.CCW);
 
         //设置一些默认值
         range = rangeTemp = range != 0 ? range : radius/15f;
@@ -205,8 +208,12 @@ public class MProgressBall extends View {
         super.onDraw(canvas);
         //画背景
         //        canvas.drawCircle(mCenter.x, mCenter.y, radius, mBackPaint);
-        canvas.clipPath(backPath);//剪切出圆形画布 画在外面的部分不显示
+//        canvas.clipPath(backPath);//剪切出圆形画布 画在外面的部分不显示
         canvas.drawColor(ballgroundColor);
+        Paint bgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        bgPaint.setColor(Color.BLACK);
+        canvas.drawPath(backPath, bgPaint);//画背景圆
+//        canvas.save();
 
         mTier = (int)textCurrent/( (int)progressMax );//当前画的是第mTier+1层
         mTier = textCurrent == progressMax*mTier ? mTier>0 ? mTier-1 : 0 : mTier;
@@ -226,6 +233,7 @@ public class MProgressBall extends View {
             drawProgress(canvas, progressCurrent);
         }
 
+
         String currMsg = numFormat.format(textCurrent/progressMax);
         Rect bounds = new Rect();
         mTextPaint.getTextBounds(currMsg, 0, currMsg.length(), bounds);
@@ -237,7 +245,8 @@ public class MProgressBall extends View {
     private void drawWaveProgress(Canvas canvas, float progressCurrent){
 
         //mCeny+wRadius-cProgress 为当前进度 所在的y轴坐标
-        float currentY = mCenter.y+radius-progressCurrent/progressMax*radius*2;
+        float currentY = 50;
+//        float currentY = mCenter.y+radius-progressCurrent/progressMax*radius*2;
         wPath.reset();
         wPath.moveTo(mCenter.x-radius, currentY);//起点
 
@@ -252,9 +261,11 @@ public class MProgressBall extends View {
         if(mTierColor.size()>0 && mTierColor.size()>mTier) {
             mPaint.setColor(mTierColor.get(mTier));
         }
-        //画波浪进度
-        canvas.drawPath(wPath, mPaint);
-
+//        //画波浪进度
+//        canvas.drawPath(wPath, mPaint);
+        ballProPath.addPath(wPath);
+        ballProPath.setFillType(Path.FillType.INVERSE_EVEN_ODD);
+        canvas.drawPath(ballProPath, mPaint);
 
         if(showProgressLine) {
             //中间线条  显示辅助的进度线条 也就是实际的进度
@@ -272,8 +283,8 @@ public class MProgressBall extends View {
                     postInvalidate();
                 }
             }else {
-                postInvalidate();
-                range = rangeTemp;
+//                postInvalidate();
+//                range = rangeTemp;
             }
         }
     }
@@ -306,6 +317,7 @@ public class MProgressBall extends View {
         }
         canvas.drawArc(mProgressArc, start, sweep, false, mPaint);
 
+//        ballProPath.addPath(wPath);
     }
 
     /**
@@ -355,7 +367,8 @@ public class MProgressBall extends View {
     public void setProgressCurrentAni(float progressCurrent2){
         pCurrent = progressCurrent2;
         tierColor(progressCurrent2);
-        animateShow();
+        postInvalidate();
+//        animateShow();
         //        mAnimator = ValueAnimator.ofFloat(0, progressCurrent2)
         //                .setDuration((long)( ANIDURATION*progressCurrent2/progressMax ));
         //        mAnimator.cancel();

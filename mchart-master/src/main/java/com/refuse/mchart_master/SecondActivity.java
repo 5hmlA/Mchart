@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by jwx272428 on 2015/9/21.
+ * Created by Jonas on 2015/9/21.
  */
 public class SecondActivity extends Activity {
 

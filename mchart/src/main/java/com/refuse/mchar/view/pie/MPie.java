@@ -125,7 +125,7 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
     /**
      * 当前饼图是否可旋转 默认不可
      */
-    private boolean pieRotateable = false;
+    private boolean pieRotateable = true;
     private float sweep4 = 360;
     private float start4;
     /**

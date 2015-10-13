@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
+import android.widget.Toast;
 
+import com.facebook.device.yearclass.YearClass;
 import com.refuse.mchar.view.progress.ChargingView;
 import com.refuse.mchar.view.progress.MProgressBall;
 import com.refuse.mchar.view.progress.MProgressWidthMsg;
@@ -24,6 +26,8 @@ public class ProgressActuvity extends Activity {
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_progress);
+        int year = YearClass.get(getApplicationContext());
+        Toast.makeText(getApplicationContext(), ""+year, Toast.LENGTH_SHORT).show();
         mBall = (MProgressBall)findViewById(R.id.progress);
         mChv = (ChargingView)findViewById(R.id.chv);
         mChv.setOnClickListener(new View.OnClickListener() {

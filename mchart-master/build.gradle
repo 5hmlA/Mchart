@@ -24,4 +24,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.0.1'
     compile project(':mchart')
     compile 'com.android.support:design:23.0.1'
+    compile 'com.facebook.device.yearclass:yearclass:1.0.1'
 }

@@ -107,10 +107,19 @@ bintray {
     configurations = ['archives']
     pkg {
         repo = "maven"  //发布到Bintray的那个仓库里，默认账户有四个库，我们这里上传到maven库
-        name = "Mchart"  //发布到Bintray上的项目名字
+        name = "mchart"  //发布到Bintray上的项目名字
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]
         publish = true
     }
 }
+
+//1    第一步是检查代码的正确性，以及编译library文件（aar，pom等等），输入下面的命令：
+//      gradlew install
+
+//2   上传编译的文件到bintray
+//      gradlew bintrayUpload
+
+//3   同步bintray用户仓库到jcenter
+//      把library同步到jcenter非常容易。只需访问网页并点击Add to JCenter
