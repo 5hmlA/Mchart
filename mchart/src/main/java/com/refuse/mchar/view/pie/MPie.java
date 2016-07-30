@@ -20,6 +20,7 @@ import android.view.animation.BounceInterpolator;
 import com.refuse.mchar.R;
 import com.refuse.mchar.bean.Apiece;
 import com.refuse.mchar.utills.Logger;
+import com.refuse.mchar.view.MathHelper;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -28,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+
+import static android.R.attr.action;
 
 /**
  * 在控件显示前 设置变量 代码执行顺序（构函---设置变量的方法(set)----onSizeChange-----onDraw）
@@ -63,6 +66,7 @@ import java.util.Random;
  * getSpecialPosition  获取特殊角度对于的扇形位置
  * pointPieOut 设置突出扇形的 突出大小 setPointPieOut提供set方法设置  内部有处理 该值过大的情况（一般不修改）
  * TsOut 设置提示线突出饼图的部分长度（一般不修改）最好先于setPointPieOut调用
+ * 2015/8/31.
  */
 public class MPie extends WarmLine implements Animator.AnimatorListener {
     /**
@@ -73,10 +77,6 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
     private Paint paintInter;
     private int width;
     private int height;
-    /**
-     * 控件的背景色
-     */
-    private int backColor = Color.WHITE;
     /**
      * 饼图 间隔线的景色
      */
@@ -100,18 +100,11 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
 
     private float centX;
     private float centY;
-    private float down_x;
-    private float down_y;
     private ViewGroup[] clashView;
     /**
      * 点击中的 那个扇形的 位置
      */
     private int clickPosition = Integer.MAX_VALUE;
-    /**
-     * 起开关作用 当旋转之后不会触发点击 获取被点击扇形位置
-     * move执行了 就变为true
-     */
-    private boolean rotate = false;
     /**
      * 特殊角度 位于此角度的扇形变大
      */
@@ -126,8 +119,6 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
      * 当前饼图是否可旋转 默认不可
      */
     private boolean pieRotateable = true;
-    private float sweep4 = 360;
-    private float start4;
     /**
      * 饼图点击 监听器
      */
@@ -144,10 +135,6 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
      * 较小的边
      */
     private float just;
-    /**
-     * 记录事件动作
-     */
-    private String action;
 
     /**
      * 饼图的 半径
@@ -161,11 +148,6 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
      * down到up之间旋转了多少度
      */
     private float eachDegrees;
-    /**
-     * 是否允许 滚动之后 出发选中事件 （点击事件）默认false
-     * 滚动后不触发点击扇形事件
-     */
-    public boolean selectAfterMove;
     /**
      * 用于控制 当饼图展开动画执行完后 去掉那个执行动画的 扇形
      */
@@ -209,6 +191,8 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
     private float showProgress = 1;
     private boolean outMoving;
     private ValueAnimator mAnimator = new ValueAnimator();
+    private float mSweeping;
+
 
     @Override
     public void onAnimationStart(Animator animation){
@@ -260,13 +244,11 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
             pieInterColor = typedArray.getColor(R.styleable.MPieView_pieInterColor, Color.WHITE);
             pieInterWidth = (int)typedArray.getDimension(R.styleable.MPieView_pieInterColor, 0);
             pointPieOut = typedArray.getDimension(R.styleable.MPieView_pointPieOut, 0);
-            backColor = typedArray.getColor(R.styleable.MPieView_piebackground, Color.WHITE);
             specialAngle = typedArray.getInt(R.styleable.MPieView_specialAngle, 0);
             outMoving = typedArray.getBoolean(R.styleable.MPieView_outMoving, false);
             PieSelector = typedArray.getBoolean(R.styleable.MPieView_PieSelector, true);
             typedArray.recycle();
         }
-        //        paintInter.setColor(pieInterColor); 出错 why？？
         init();
     }
 
@@ -317,13 +299,6 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
         outRectF = new RectF(centX-pieRadius-pointPieOut, centY-pieRadius-pointPieOut, centX+pieRadius+pointPieOut,
                 centY+pieRadius+pointPieOut);
 
-
-        // 当背景为透明的时候 获取布局的背景色
-        if(Integer.MAX_VALUE == backColor) {
-            backColor = getBackColor();// ondraw也无法拿到布局中设置的背景色
-            // backColor = Color.RED;
-        }
-
         //==================================饼图的展现动画=从这里触发====外界无论设置啥变量最后都会走到这======================================
         //内往外 的展现动画 需要在此处出发，，因为这个动画 需要先获取到just
         if(pieData.size() != 0) {
@@ -350,14 +325,7 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
     @Override
     protected void onDraw(Canvas canvas){
 
-        // 无论控件 那边大 都在中间的正方形画饼图
-
-        // 画背景
-        mPaint.setColor(backColor);
-        RectF back = new RectF(0, 0, width, height);
-        canvas.drawRect(back, mPaint);
-
-//        // 画标题
+        //        // 画标题
         //        float measureText = titleP.measureText(pieTiele);
         //        Rect bounds = new Rect();
         //        titleP.getTextBounds(pieTiele, 0, pieTiele.length(), bounds);
@@ -420,7 +388,8 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
                     // 画突出扇形
                     canvas.drawArc(outRectF, startPie*showProgress, pie.getSweepAngle()*showProgress, true, mPaint);
                     if(pieInterWidth != 0) {
-                        canvas.drawArc(outRectF, startPie*showProgress, pie.getSweepAngle()*showProgress, true, paintInter);
+                        canvas.drawArc(outRectF, startPie*showProgress, pie.getSweepAngle()*showProgress, true,
+                                paintInter);
                     }
                 }else {
                     // =============== 画 饼图的扇形=====================
@@ -431,124 +400,88 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
                 }
             }
         }
-        //        super.onDraw(canvas);//先画父类提示线条   //或者放最后 通过修改画提示线的颜色 来让提示线在展示动画之后出现
-        //==================================饼图的展现动画===========================================
-        if(pieshowani == PieShowAnimation.SCANNING && showPieAnimation) { // 不执行fillOut动画 同时 允许出现饼图展现动画
-            // 则执行扇形扫描动画
-            if(!hideAniCircle) {// 扇形动画完后会 变成条线 所以执行完 要去掉这个扇形
-                // 画最顶层的 白色扇形 360度的 用于展现饼图慢慢展开的效果
-                mPaint.setColor(backColor);
-                // 画扇形所需要的 矩形
-                RectF oval4 = new RectF(centX-just/2, centY-just/2, centX+just/2, centY+just/2);
-                canvas.drawArc(oval4, start4, sweep4, true, mPaint);
-            }
-        }
         super.onDraw(canvas);// 通过修改画提示线的颜色 来让提示线在展示动画之后出现
     }
 
-    //    public void drawSpecialPie(Canvas canvas, float mWidth, float mHeight, Apiece pie, float startPie, float outORin){
-    //        RectF oval2 = new RectF(padings+mWidth/2-outORin, padings+mHeight/2-outORin, width-padings-mWidth/2+outORin,
-    //                height-padings-mHeight/2+outORin);
-    //        canvas.drawArc(oval2, pie.getStartAngle()+degrees, pie.getSweepAngle(), true, mPaint);
-    //
-    //        // 当饼图的间隔线宽度不为0 的时候 才画剑阁线
-    //        if(pieInterWidth != 0) {
-    //            // 画突出扇形的间隔
-    //            RectF ovalInter2 = new RectF(padings-outORin-pieInterWidth/2+mWidth/2, padings-outORin-pieInterWidth/2+mHeight/2,
-    //                    width-padings+pieInterWidth/2-mWidth/2+outORin, height-padings+pieInterWidth/2-mHeight/2+outORin);
-    //            canvas.drawArc(ovalInter2, startPie, pie.getSweepAngle(), true, paintInter);
-    //        }
-    //    }
-
-    // view 没有拦截事件 所以只能选择dispatchTouchEvent或者onTouchevent来处理时间
-    // 但是 view默认是不可点击的 所以事件不会被传递到onTouchevent,所以view的事件处理建议写在dispatchTouchEvent内
-    // 每次事件都会 重新调用该方法
     @Override
-    public boolean dispatchTouchEvent(MotionEvent event){
-        //请求 会产生事件冲突的外部ViewGroup不要拦截事件
-        if(clashView != null && clashView.length>0) {
-            for(int i = 0; i<clashView.length; i++) {
-                clashView[i].requestDisallowInterceptTouchEvent(true);
-            }
+    public boolean onDown(MotionEvent e){
+        down_x = e.getX();
+        down_y = e.getY();
+        // 当 该点 不再饼图内的画 说明没点中饼图 （应该在 down处处理 后续就不需要处理）
+        double c = Math.sqrt(( Math.pow(( down_x-centX ), 2) )+Math.pow(( down_y-centY ), 2));
+        if(c>pieRadius) {
+            return false;// 父类的 down事件处理逻辑就不会执行 因为super在下面
         }
-        switch(event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                action = "down";
-                rotate = false;// 清除 旋转状态
-                down_x = event.getX();
-                down_y = event.getY();
-                // 当 该点 不再饼图内的画 说明没点中饼图 （应该在 down处处理 后续就不需要处理）
-                double c = Math.sqrt(( Math.pow(( down_x-centX ), 2) )+Math.pow(( down_y-centY ), 2));
-                if(c>pieRadius) {
-                    return false;// 父类的 down事件处理逻辑就不会执行 因为super在下面
-                }
 
-                // 根据 cos函数 获取当前up时的点 与水平右之间的角度 判断点击的是哪个扇形
-                selectedPosition = clickPosition = checkClickWhere(down_x, down_y);
-                if(PieSelector) {
-                    //TODO 传值给父类
-                    //                    invalidate();
-                }
-
-                // return true; // 当事件被消费之后 后续事件才会被该控件处理 原生view没处理 //父类已经
-                // 返回true了这里不需要 否则会阻断父类的down 当父类是view的时候需要打开
-                break;
-            case MotionEvent.ACTION_MOVE:
-                if(!pieRotateable) {
-                    break;
-                }
-                float move_x = event.getX();
-                float move_y = event.getY();
-
-                // 当移动的距离超过0.001就算滑动
-                if(Math.abs(move_x-down_x)>0.0001 || Math.abs(move_y-down_y)>0.0001) {
-                    rotate = true;// 处于旋转状态
-                    action = "move";
-                }
-                // rotate = true;// 处于旋转状态
-
-                //TODO 给父类旋转角度的值    旋转饼图逻辑，返回旋转角度
-                rotedAngle = rotatePie(move_x, move_y);
-
-                // 当 该点 不再饼图内的画 说明没点中饼图 （应该在 down处处理 后续就不需要处理）
-                double c3 = Math.sqrt(( Math.pow(( down_x-centX ), 2) )+Math.pow(( down_y-centY ), 2));
-                if(c3>pieRadius) {
-                    // TODO
-                    cleanWire = true;// 清除 所you提示线条
-                    return true;// 父类的 down事件处理逻辑就不会执行 因为super在下面
-                }
-                // clianWire = false;
-
-                // return true; // 当事件被消费之后 后续事件才会被该控件处理 //父类已经 返回true了这里不需要
-                // 当父类是view的时候需要打开
-                // 否则会阻断父类的down
-                break;
-            case MotionEvent.ACTION_UP:
-                eachDegrees = 0;//清0 下次旋转重新计算
-
-                float up_x = event.getX();
-                float up_y = event.getY();
-
-                // 当 该点 不再饼图内的画 说明没点中饼图 （应该在 down处处理 后续就不需要处理）
-                double c1 = Math.sqrt(( Math.pow(( up_x-centX ), 2) )+Math.pow(( up_y-centY ), 2));
-                if(c1>pieRadius) {
-                    return true;// 直接return
-                }else {
-                    action = "up";
-                }
-
-                //==============================move之后是否可执行之后操作==========================================
-                if(!selectAfterMove && rotate) {// rotate在move的时候 设置为true ---- down的时候设置为false
-                    // 如过up之前有move过的画 up的时候就不判断点击哪了
-                    // move 之后 后续代码不执行 父类执行
-                    break;
-                }
-                selectedPosition = clickPosition = checkClickWhere(up_x, up_y);// 会触发选中
-
-                break;
-        }
-        return super.dispatchTouchEvent(event);
+        // 根据 cos函数 获取当前up时的点 与水平右之间的角度 判断点击的是哪个扇形
+        selectedPosition = clickPosition = checkClickWhere(down_x, down_y);
+        return super.onDown(e);
     }
+
+    @Override
+    public void onShowPress(MotionEvent e){
+
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent e){
+        eachDegrees = 0;//清0 下次旋转重新计算
+        float up_x = e.getX();
+        float up_y = e.getY();
+
+        // 当 该点 不再饼图内的画 说明没点中饼图 （应该在 down处处理 后续就不需要处理）
+        double c1 = Math.sqrt(( Math.pow(( up_x-centX ), 2) )+Math.pow(( up_y-centY ), 2));
+        if(c1>pieRadius) {
+            return true;// 直接return
+        }
+        selectedPosition = clickPosition = checkClickWhere(up_x, up_y);// 会触发选中
+        return super.onSingleTapUp(e);
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY){
+        if(!pieRotateable) {
+            return false;
+        }
+        rotedAngle = rotatePie(e2.getX(), e2.getY());
+
+        // 当 该点 不再饼图内的画 说明没点中饼图 （应该在 down处处理 后续就不需要处理）
+        double c3 = Math.sqrt(( Math.pow(( down_x-centX ), 2) )+Math.pow(( down_y-centY ), 2));
+        if(c3>pieRadius) {
+            // TODO
+            cleanWire = true;// 清除 所you提示线条
+            return true;// 父类的 down事件处理逻辑就不会执行 因为super在下面
+        }
+        return super.onScroll(e1, e2, distanceX, distanceY);
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e){
+
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY){
+        System.out.println(MathHelper.getPointAngle(-velocityX, -velocityY, 0, 0));
+        return true;
+    }
+
+//    private class FlingRunnable implements Runnable {
+//        private static final int FLYWHEEL_TIMEOUT = 40;
+//        private final OverScroller mScroller;
+//
+//        FlingRunnable(){
+//            mScroller = new OverScroller(getContext());
+//        }
+//
+//        @Override
+//        public void run(){
+//            if(rotedAngle>0) {
+//                rotedAngle/postDelayed(this, FLYWHEEL_TIMEOUT);
+//            }
+//        }
+//    }
+
 
     /**
      * 旋转 饼图
@@ -641,42 +574,32 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
         return clickAngle;
     }
 
-
-    /**
-     * 设置 饼图数据 解析出角度颜色数据
-     *
-     * @param pieData2
-     */
-    public void setPiedata2(List<Apiece> pieData2){
-        AnalyticData(pieData2);
-    }
-
     /**
      * 设置数据
      * Apiece创建 颜色必备
      *
-     * @param pieData2
+     * @param pieData
      */
-    public void AnalyticData(List<Apiece> pieData2){
-        if(pieData2.size() == 0) {
+    public void feedData(List<Apiece> pieData){
+        if(pieData.size() == 0) {
             throw new RuntimeException("设置的数据错误");
         }
-        pieData.clear();
+        this.pieData.clear();
         float totalData = 0;
-        for(Apiece pie : pieData2) {
+        for(Apiece pie : pieData) {
             totalData += pie.getNum();
         }
-        float totalAngle = 360-0*pieData2.size();
+        float totalAngle = 360-0*pieData.size();
         float startAngle = 0;
         //计算角度
-        for(Apiece pie : pieData2) {
+        for(Apiece pie : pieData) {
             float sweepAngle = pie.getNum()/totalData*totalAngle;
             pie.setStartAngle(startAngle);
             pie.setSweepAngle(sweepAngle);
             startAngle += sweepAngle;
         }
-        this.pieData = pieData2;
-        if(pieData2.get(0).getPieColor() == Integer.MAX_VALUE) {
+        this.pieData = pieData;
+        if(pieData.get(0).getPieColor() == Integer.MAX_VALUE) {
             setEachPieColor();
         }
         extraDataInit();
@@ -686,32 +609,32 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
     /**
      * 设置数据
      *
-     * @param pieData2
+     * @param pieData
      */
-    public void setPiedata3(Float[] pieData2){
-        List<Float> floats = Arrays.asList(pieData2);
-        setPiedata(floats);
+    public void feedData(Float[] pieData){
+        List<Float> floats = Arrays.asList(pieData);
+        feedData2(floats);
     }
 
     /**
      * 设置 饼图数据 解析出角度颜色数据
      *
-     * @param pieData2
+     * @param pieData
      */
-    public void setPiedata(List<Float> pieData2){
-        Logger.i("显示控件前设置变量代码执行顺序", "设置数据入口--setPiedata(List<Float> pieData2)");
-        pieData.clear();// 清空原有 数据
-        // pieData.addAll(pieData2);
-        for(Float each : pieData2) {
+    public void feedData2(List<Float> pieData){
+        Logger.i("显示控件前设置变量代码执行顺序", "设置数据入口--feedData(List<Float> pieData)");
+        this.pieData.clear();// 清空原有 数据
+        // pieData.addAll(pieData);
+        for(Float each : pieData) {
             totalPieNum += each;
         }
         float startAngle = 0;
-        for(Float each : pieData2) {
+        for(Float each : pieData) {
             float sweepAngle = each/totalPieNum*360;
             // startAngle = ;
             Apiece pie = new Apiece("", each, 0, startAngle, sweepAngle);
             startAngle += sweepAngle;
-            pieData.add(pie);
+            this.pieData.add(pie);
         }
         extraDataInit();
         // 为每个扇形设置不同颜色
@@ -732,7 +655,7 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
 
     /**
      * 设置饼图各扇形的描述
-     * 之前必须设置饼图的 folat数据 setPiedata(List<Float> pieData2)
+     * 之前必须设置饼图的 folat数据 feedData(List<Float> pieData2)
      *
      * @param pieDescData2
      */
@@ -781,20 +704,20 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
         switch(pieshowani) {
             case SCANNING:
                 //扫描展现动画
-                // ---够函--setPiedata---到aniShowPie ---onsizechange----ondraw
+                // ---够函--feedData---到aniShowPie ---onsizechange----ondraw
                 mAnimator.setFloatValues(360, 0);
                 mAnimator.start();
                 mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation){
-                        sweep4 = (float)animation.getAnimatedValue();
+                        mSweeping = (float)animation.getAnimatedValue();
                         postInvalidate();
                     }
                 });
                 break;
             case FILLOUTING:
                 //内往外扩张动画
-                // --setPiedata---到aniShowPie 此时just还没拿到数据(just在onsizechange里面获取值得)
+                // --feedData---到aniShowPie 此时just还没拿到数据(just在onsizechange里面获取值得)
                 mAnimator.setFloatValues(0, pieRadius);
                 mAnimator.start();
                 mAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -838,22 +761,6 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
             // int ranColor = Color.parseColor("#" + hexString);
             eachP.setPieColor(ranColor);
         }
-    }
-
-    /**
-     * 控件的背景颜色
-     */
-    public int getBackColor(){
-        return backColor;
-    }
-
-    /**
-     * 控件的背景颜色
-     *
-     * @param backColor
-     */
-    public void setBackColor(int backColor){
-        this.backColor = backColor;
     }
 
     /**
@@ -1069,7 +976,6 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
      */
     public void setClickPosition(int clickPosition){
         this.clickPosition = clickPosition;
-        action = "up";
         cleanWire = true;
         postInvalidate();
         //		cleanWire = false;
@@ -1107,23 +1013,6 @@ public class MPie extends WarmLine implements Animator.AnimatorListener {
      */
     public void setClashOuterViewGroup(ViewGroup... clashView){
         this.clashView = clashView;
-    }
-
-
-    /**
-     * 控件的背景颜色
-     */
-    public int getPieBackColor(){
-        return backColor;
-    }
-
-    /**
-     * 控件的背景颜色
-     *
-     * @param backColor
-     */
-    public void setPieBackColor(int backColor){
-        this.backColor = backColor;
     }
 
     //    /**
